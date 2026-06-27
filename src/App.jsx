@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Canvas } from '@react-three/fiber'
 import Zone0Entry      from '@components/zones/Zone0Entry'
 import Zone1Land       from '@components/zones/Zone1Land'
 import Zone2People     from '@components/zones/Zone2People'
@@ -8,6 +9,10 @@ import Zone5Pledge     from '@components/zones/Zone5Pledge'
 import Navbar          from '@components/ui/Navbar'
 import LoadingScreen   from '@components/ui/LoadingScreen'
 import ZoneIndicator   from '@components/ui/ZoneIndicator'
+
+import WorldCamera     from '@components/three/WorldCamera'
+import DustParticles   from '@components/three/DustParticles'
+import TerrainMesh     from '@components/three/TerrainMesh'
 
 export default function App() {
   const [loaded, setLoaded]       = useState(false)
@@ -40,14 +45,25 @@ export default function App() {
       {/* Loading Gate */}
       {!loaded && <LoadingScreen onComplete={() => setLoaded(true)} />}
 
-      {/* Persistent UI */}
+      {/* Persistent UI & World */}
       {loaded && (
         <>
           <Navbar activeZone={activeZone} />
           <ZoneIndicator activeZone={activeZone} />
 
+          {/* Global 3D Scene */}
+          <div className="fixed inset-0 z-0 bg-earth-dark pointer-events-none">
+            <Canvas>
+              <ambientLight intensity={0.5} />
+              <directionalLight position={[10, 10, 5]} intensity={1} />
+              <WorldCamera />
+              <DustParticles />
+              <TerrainMesh />
+            </Canvas>
+          </div>
+
           {/* World Journey */}
-          <main>
+          <main className="relative z-10 w-full">
             <Zone0Entry     onEnter={() => setActiveZone(0)} />
             <Zone1Land      onEnter={() => setActiveZone(1)} />
             <Zone2People    onEnter={() => setActiveZone(2)} />
