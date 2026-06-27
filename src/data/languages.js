@@ -1,0 +1,25 @@
+// Dust translated into 22 major Indian languages
+export const DUST_IN_LANGUAGES = [
+  { word: 'धूल', language: 'Hindi', script: 'Devanagari' },
+  { word: 'தூசி', language: 'Tamil', script: 'Tamil' },
+  { word: 'దుమ్ము', language: 'Telugu', script: 'Telugu' },
+  { word: 'ಧೂಳು', language: 'Kannada', script: 'Kannada' },
+  { word: 'പൊടി', language: 'Malayalam', script: 'Malayalam' },
+  { word: 'ধুলো', language: 'Bengali', script: 'Bengali' },
+  { word: 'धूळ', language: 'Marathi', script: 'Devanagari' },
+  { word: 'ધૂળ', language: 'Gujarati', script: 'Gujarati' },
+  { word: 'ਧੂੜ', language: 'Punjabi', script: 'Gurmukhi' },
+  { word: 'ଧୂଳି', language: 'Odia', script: 'Odia' },
+  { word: 'ধূলি', language: 'Assamese', script: 'Assamese' },
+  { word: 'دھول', language: 'Urdu', script: 'Arabic' },
+  { word: 'धूलिः', language: 'Sanskrit', script: 'Devanagari' },
+  { word: 'धुलो', language: 'Nepali', script: 'Devanagari' },
+  { word: 'ꯂꯩꯄꯥꯛ', language: 'Manipuri', script: 'Meetei Mayek' },
+  { word: 'गुबुन', language: 'Bodo', script: 'Devanagari' },
+  { word: 'धूड़', language: 'Dogri', script: 'Devanagari' },
+  { word: 'گَرد', language: 'Kashmiri', script: 'Arabic' },
+  { word: 'धुल्ल', language: 'Konkani', script: 'Devanagari' },
+  { word: 'धूर', language: 'Maithili', script: 'Devanagari' },
+  { word: 'ᱥᱩᱨᱤ', language: 'Santali', script: 'Ol Chiki' },
+  { word: 'ڌُوڙ', language: 'Sindhi', script: 'Arabic' }
+]

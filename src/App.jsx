@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
 import Zone0Entry      from '@components/zones/Zone0Entry'
 import Zone1Land       from '@components/zones/Zone1Land'
@@ -9,38 +9,50 @@ import Zone5Pledge     from '@components/zones/Zone5Pledge'
 import Navbar          from '@components/ui/Navbar'
 import LoadingScreen   from '@components/ui/LoadingScreen'
 import ZoneIndicator   from '@components/ui/ZoneIndicator'
+import ErrorBoundary   from '@components/ui/ErrorBoundary'
 
 import WorldCamera     from '@components/three/WorldCamera'
 import DustParticles   from '@components/three/DustParticles'
 import TerrainMesh     from '@components/three/TerrainMesh'
+import DustHaze        from '@components/three/DustHaze'
 
 export default function App() {
-  const [loaded, setLoaded]       = useState(false)
+  const [loaded, setLoaded] = useState(false)
   const [activeZone, setActiveZone] = useState(0)
-  const cursorRef     = useRef(null)
+  const [isTouchDevice, setIsTouchDevice] = useState(false)
+  
+  const cursorRef = useRef(null)
   const cursorRingRef = useRef(null)
 
-  // Custom cursor tracking
   useEffect(() => {
+    // Check if device supports touch to disable custom cursor
+    const touchCheck = 'ontouchstart' in window || navigator.maxTouchPoints > 0
+    setIsTouchDevice(touchCheck)
+
+    if (touchCheck) return
+
     const move = (e) => {
       if (cursorRef.current) {
-        cursorRef.current.style.left = e.clientX - 6 + 'px'
-        cursorRef.current.style.top  = e.clientY - 6 + 'px'
+        cursorRef.current.style.transform = `translate3d(${e.clientX - 6}px, ${e.clientY - 6}px, 0)`
       }
       if (cursorRingRef.current) {
-        cursorRingRef.current.style.left = e.clientX - 18 + 'px'
-        cursorRingRef.current.style.top  = e.clientY - 18 + 'px'
+        cursorRingRef.current.style.transform = `translate3d(${e.clientX - 18}px, ${e.clientY - 18}px, 0)`
       }
     }
+    
     window.addEventListener('mousemove', move)
     return () => window.removeEventListener('mousemove', move)
   }, [])
 
   return (
-    <>
-      {/* Custom Cursor */}
-      <div ref={cursorRef}     className="cursor" />
-      <div ref={cursorRingRef} className="cursor-ring" />
+    <ErrorBoundary>
+      {/* Custom Cursor (Fine pointer only) */}
+      {!isTouchDevice && (
+        <>
+          <div ref={cursorRef} className="cursor" />
+          <div ref={cursorRingRef} className="cursor-ring" />
+        </>
+      )}
 
       {/* Loading Gate */}
       {!loaded && <LoadingScreen onComplete={() => setLoaded(true)} />}
@@ -52,14 +64,17 @@ export default function App() {
           <ZoneIndicator activeZone={activeZone} />
 
           {/* Global 3D Scene */}
-          <div className="fixed inset-0 z-0 bg-earth-dark pointer-events-none">
-            <Canvas>
-              <ambientLight intensity={0.5} />
-              <directionalLight position={[10, 10, 5]} intensity={1} />
-              <WorldCamera />
-              <DustParticles />
-              <TerrainMesh />
-            </Canvas>
+          <div className="fixed inset-0 z-0 bg-earth-dark pointer-events-none w-full h-full">
+            <Suspense fallback={null}>
+              <Canvas gl={{ antialias: true, powerPreference: "high-performance" }}>
+                <ambientLight intensity={0.6} />
+                <directionalLight position={[10, 15, 5]} intensity={1.2} castShadow />
+                <WorldCamera activeZone={activeZone} />
+                <DustParticles activeZone={activeZone} />
+                <TerrainMesh activeZone={activeZone} />
+                <DustHaze activeZone={activeZone} />
+              </Canvas>
+            </Suspense>
           </div>
 
           {/* World Journey */}
@@ -73,6 +88,6 @@ export default function App() {
           </main>
         </>
       )}
-    </>
+    </ErrorBoundary>
   )
 }

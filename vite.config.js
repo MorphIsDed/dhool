@@ -15,4 +15,7 @@ export default defineConfig({
       '@assets': path.resolve(__dirname, './src/assets'),
     },
   },
+  build: {
+    chunkSizeWarningLimit: 1200 // Raise limit since mapbox-gl is naturally large
+  }
 })

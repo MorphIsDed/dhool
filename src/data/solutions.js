@@ -3,7 +3,7 @@ export const SOLUTIONS = {
     {
       id: 'auth-1',
       title: 'Mandatory Dust Suppression',
-      icon: '💧',
+      icon: 'water',
       description: 'Require water sprinkler trucks on all unpaved municipal roads twice daily during dry months (Oct–May).',
       impact: 'Reduces road dust PM10 by ~60%',
       timeline: '3 months',
@@ -12,7 +12,7 @@ export const SOLUTIONS = {
     {
       id: 'auth-2',
       title: 'Industrial Green Belt Act',
-      icon: '🌳',
+      icon: 'trees',
       description: 'Mandate 50m vegetative buffer zones around all Category A industries in the RBD corridor.',
       impact: 'Reduces industrial fugitive dust by ~35%',
       timeline: '2 years',
@@ -21,7 +21,7 @@ export const SOLUTIONS = {
     {
       id: 'auth-3',
       title: 'Real-Time PM10 Sensor Network',
-      icon: '📡',
+      icon: 'sensors',
       description: 'Deploy 20 low-cost IoT PM10 sensors at key intersections with public dashboard and authority alerts.',
       impact: 'Enables data-driven intervention',
       timeline: '6 months',
@@ -30,7 +30,7 @@ export const SOLUTIONS = {
     {
       id: 'auth-4',
       title: 'Construction Site Compliance',
-      icon: '🏗️',
+      icon: 'construction',
       description: 'Enforce anti-dust nets, wheel wash facilities, and covered material storage on all active construction sites.',
       impact: 'Reduces construction PM10 by ~50%',
       timeline: '1 month (policy)',
@@ -41,7 +41,7 @@ export const SOLUTIONS = {
     {
       id: 'cit-1',
       title: 'N95/FFP2 Mask Programme',
-      icon: '😷',
+      icon: 'mask',
       description: 'Distribute subsidised N95 masks through ward offices during high-dust season. Know your dust score before stepping out.',
       impact: 'Reduces personal PM10 inhalation by 95%',
       timeline: 'Immediate',
@@ -50,7 +50,7 @@ export const SOLUTIONS = {
     {
       id: 'cit-2',
       title: 'Indoor Dust-Filtering Plants',
-      icon: '🪴',
+      icon: 'plants',
       description: 'Spider plant, Peace lily, and Areca palm thrive in Chhattisgarh\'s climate and filter coarse particulates indoors.',
       impact: 'Reduces indoor PM10 by ~20–30%',
       timeline: 'Immediate',
@@ -59,7 +59,7 @@ export const SOLUTIONS = {
     {
       id: 'cit-3',
       title: 'Report a Dust Source',
-      icon: '📱',
+      icon: 'report',
       description: 'Use the DHOOL community reporting portal to flag construction sites violating norms, unmaintained roads, or burning waste.',
       impact: 'Feeds authority action queue',
       timeline: 'Immediate',
@@ -68,7 +68,7 @@ export const SOLUTIONS = {
     {
       id: 'cit-4',
       title: 'Plantation Drive Participation',
-      icon: '🌱',
+      icon: 'plantation',
       description: 'Join the quarterly RBD Corridor tree plantation drives. Native species like Neem, Peepal, and Mahua are prioritised.',
       impact: 'Long-term PM10 reduction',
       timeline: 'Seasonal',

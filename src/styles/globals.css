@@ -1,20 +1,50 @@
 @import "tailwindcss";
 
-/* ─── Custom Properties ─── */
-:root {
-  --dust-brown:    #C4956A;
-  --rust-red:      #A0522D;
-  --sand-light:    #E8D5B7;
-  --earth-dark:    #2C1810;
-  --haze-grey:     #B8A898;
-  --sky-haze:      #D4C4A8;
-  --green-hope:    #5A7A52;
-  --particle-glow: #F4A460;
-  --ui-cream:      #F5EDD8;
+/* ─── Tailwind 4 Theme Extension ─── */
+@theme {
+  --color-dust-brown: #C4956A;
+  --color-rust-red: #A0522D;
+  --color-sand-light: #E8D5B7;
+  --color-earth-dark: #2C1810;
+  --color-haze-grey: #B8A898;
+  --color-sky-haze: #D4C4A8;
+  --color-green-hope: #5A7A52;
+  --color-particle-glow: #F4A460;
+  --color-ui-cream: #F5EDD8;
 
   --font-display: 'Tiro Devanagari Hindi', serif;
-  --font-body:    'Inter', sans-serif;
-  --font-mono:    'JetBrains Mono', monospace;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --animate-fade-in: fade-in 0.8s ease-out forwards;
+  --animate-pulse-glow: pulse-glow 2s infinite ease-in-out;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.3; transform: scale(1); filter: drop-shadow(0 0 2px var(--color-particle-glow)); }
+  50% { opacity: 0.8; transform: scale(1.1); filter: drop-shadow(0 0 12px var(--color-particle-glow)); }
+}
+
+/* ─── Custom Properties ─── */
+:root {
+  --dust-brown: #C4956A;
+  --rust-red: #A0522D;
+  --sand-light: #E8D5B7;
+  --earth-dark: #2C1810;
+  --haze-grey: #B8A898;
+  --sky-haze: #D4C4A8;
+  --green-hope: #5A7A52;
+  --particle-glow: #F4A460;
+  --ui-cream: #F5EDD8;
+
+  --font-display: 'Tiro Devanagari Hindi', serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
 /* ─── Base ─── */
@@ -30,7 +60,13 @@ body {
   color: var(--ui-cream);
   font-family: var(--font-body);
   overflow-x: hidden;
-  cursor: none; /* custom cursor */
+}
+
+/* Custom cursor default: show only on fine pointers (desktop) */
+@media (pointer: fine) {
+  body {
+    cursor: none;
+  }
 }
 
 /* ─── Custom Cursor ─── */
@@ -43,7 +79,9 @@ body {
   z-index: 9999;
   mix-blend-mode: difference;
   transition: transform 0.15s ease;
+  transform: translate3d(0, 0, 0);
 }
+
 .cursor-ring {
   width: 36px; height: 36px;
   border: 1.5px solid var(--dust-brown);
@@ -51,13 +89,22 @@ body {
   position: fixed;
   pointer-events: none;
   z-index: 9998;
-  transition: transform 0.35s ease, width 0.2s, height 0.2s;
+  transition: transform 0.35s ease-out, width 0.2s, height 0.2s;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Hide custom cursor on mobile/tablets */
+@media (pointer: coarse) {
+  .cursor, .cursor-ring {
+    display: none !important;
+  }
 }
 
 /* ─── Scrollbar ─── */
-::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--earth-dark); }
-::-webkit-scrollbar-thumb { background: var(--dust-brown); border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: var(--dust-brown); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--particle-glow); }
 
 /* ─── Canvas ─── */
 canvas { display: block; }
@@ -77,10 +124,38 @@ canvas { display: block; }
   background-clip: text;
 }
 
+/* ─── Print Styles for PDF Policy Brief ─── */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  
+  #print-brief, #print-brief * {
+    visibility: visible;
+  }
+  
+  #print-brief {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: white !important;
+    color: black !important;
+    padding: 1.5in !important;
+    font-family: 'Inter', sans-serif !important;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+}
+
 /* ─── Reduce motion ─── */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0.01ms !important;
     transition-duration: 0.01ms !important;
+    transition-delay: 0.01ms !important;
   }
 }

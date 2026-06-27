@@ -4,13 +4,32 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="DHOOL — An interactive chronicle of dust pollution in the Raipur-Bhilai-Durg corridor" />
-    <title>DHOOL | धूल — Dust Chronicle RBD</title>
+    
+    <!-- Theme & Search Engines -->
+    <meta name="theme-color" content="#2C1810" />
+    <meta name="description" content="DHOOL (धूल) — An interactive 3D chronicle of the dust pollution crisis in the Raipur–Bhilai–Durg corridor of Chhattisgarh, India." />
+    <title>DHOOL | धूल — Dust Pollution Chronicle RBD Corridor</title>
+    
+    <!-- Open Graph (Facebook/LinkedIn/Discord) -->
+    <meta property="og:title" content="DHOOL / धूल — Dust Pollution Chronicle RBD Corridor" />
+    <meta property="og:description" content="An interactive scrollytelling chronicle mapping the dust pollution crisis in Chhattisgarh's industrial corridor." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/og-preview.png" />
+    
+    <!-- Preconnect Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   </head>
   <body>
+    <noscript>
+      <div style="background-color: #2C1810; color: #F5EDD8; font-family: sans-serif; text-align: center; padding: 3rem; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <h1 style="font-size: 2rem; margin-bottom: 1rem;">JavaScript Required</h1>
+        <p style="color: #B8A898; max-width: 400px; line-height: 1.6;">
+          DHOOL is an interactive 3D WebGL experience. Please enable JavaScript in your browser to view this chronicle.
+        </p>
+      </div>
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
