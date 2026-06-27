@@ -10,126 +10,97 @@ export default function LoadingScreen({ onComplete }) {
   useEffect(() => {
     if (!containerRef.current) return
 
+    const skipIntro =
+      new URLSearchParams(window.location.search).has('skipIntro') ||
+      window.sessionStorage.getItem('dhool-intro-seen') === 'true'
+
+    if (skipIntro) {
+      onComplete()
+      return
+    }
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reducedMotion) {
+      window.sessionStorage.setItem('dhool-intro-seen', 'true')
+      onComplete()
+      return
+    }
+
     const words = containerRef.current.querySelectorAll('.lang-word')
     const tl = gsap.timeline({
       onComplete: () => {
+        window.sessionStorage.setItem('dhool-intro-seen', 'true')
         onComplete()
-      }
+      },
     })
     timelineRef.current = tl
 
-    // Animate progress bar width
-    tl.to(progressRef.current, {
-      width: '100%',
-      duration: 6.8,
-      ease: 'none'
-    }, 0)
+    tl.to(progressRef.current, { width: '100%', duration: 1.6, ease: 'none' }, 0)
 
-    // Cycle through language words
     words.forEach((word, idx) => {
       const isLast = idx === words.length - 1
-      
-      // Fade in & slide up
-      tl.to(word, {
-        opacity: 1,
-        y: 0,
-        rotateX: 0,
-        duration: 0.15,
-        ease: 'power2.out'
-      })
-      
-      // Hold then fade out (except the last one)
+
+      tl.fromTo(
+        word,
+        { opacity: 0, y: 18 },
+        { opacity: 1, y: 0, duration: 0.12, ease: 'power2.out' },
+      )
+
       if (!isLast) {
-        tl.to(word, {
-          opacity: 0,
-          y: -20,
-          rotateX: 10,
-          duration: 0.12,
-          delay: 0.12,
-          ease: 'power2.in'
-        })
+        tl.to(word, { opacity: 0, y: -12, duration: 0.1, ease: 'power2.in' }, '+=0.04')
       } else {
-        // Last word (Hindi "धूल") - dramatic scale up and hold
-        tl.to(word, {
-          scale: 1.25,
-          color: '#E8D5B7', // var(--sand-light)
-          duration: 0.5,
-          ease: 'back.out(2)'
-        })
-        tl.to(word, {
-          opacity: 0,
-          scale: 1.5,
-          filter: 'blur(10px)',
-          duration: 0.8,
-          delay: 0.6,
-          ease: 'power2.inOut'
-        })
+        tl.to(word, { scale: 1.12, color: '#E8D5B7', duration: 0.2, ease: 'power2.out' })
+        tl.to(word, { opacity: 0, scale: 1.2, duration: 0.22, ease: 'power2.in' }, '+=0.15')
       }
     })
 
-    // Fade out the entire screen
-    tl.to(containerRef.current, {
-      opacity: 0,
-      duration: 0.8,
-      ease: 'power2.inOut'
-    }, '-=0.4')
+    tl.to(containerRef.current, { opacity: 0, duration: 0.22, ease: 'power2.inOut' }, '-=0.12')
 
-    return () => {
-      if (timelineRef.current) {
-        timelineRef.current.kill()
-      }
-    }
+    return () => timelineRef.current?.kill()
   }, [onComplete])
 
   const handleSkip = () => {
-    if (timelineRef.current) {
-      timelineRef.current.kill()
-    }
-    // Fade out immediately and complete
+    timelineRef.current?.kill()
+    window.sessionStorage.setItem('dhool-intro-seen', 'true')
     gsap.to(containerRef.current, {
       opacity: 0,
-      duration: 0.3,
+      duration: 0.15,
       ease: 'power2.inOut',
-      onComplete
+      onComplete,
     })
   }
 
   return (
-    <div 
-      ref={containerRef} 
+    <div
+      ref={containerRef}
       onClick={handleSkip}
-      className="fixed inset-0 bg-earth-dark flex flex-col items-center justify-center z-[9000] cursor-pointer select-none"
+      onKeyDown={(e) => e.key === 'Enter' && handleSkip()}
+      role="button"
+      tabIndex={0}
+      aria-label="Loading screen. Press Enter or click to skip."
+      className="fixed inset-0 z-[9000] flex cursor-pointer select-none flex-col items-center justify-center bg-earth-dark"
     >
-      {/* Cinematic Word Cycle */}
-      <div className="relative h-24 flex items-center justify-center w-full overflow-hidden mb-8">
+      <div className="relative mb-8 flex h-20 w-full items-center justify-center overflow-hidden">
         {DUST_IN_LANGUAGES.map((lang) => (
-          <span 
-            key={lang.language} 
-            className="absolute opacity-0 translate-y-8 rotate-x-[-45deg] lang-word text-4xl md:text-6xl font-bold tracking-widest text-dust-brown text-center px-4"
-            style={{ 
-              fontFamily: 'var(--font-display)',
-              transformOrigin: 'bottom center',
-              backfaceVisibility: 'hidden'
-            }}
+          <span
+            key={lang.language}
+            className="lang-word absolute px-4 text-center text-3xl font-semibold tracking-wide text-dust-brown opacity-0 md:text-5xl"
+            style={{ fontFamily: 'var(--font-display)' }}
           >
             {lang.word}
           </span>
         ))}
       </div>
 
-      {/* Progress & Skip Prompt */}
       <div className="flex flex-col items-center gap-4">
-        <div className="text-xs text-haze-grey tracking-[0.3em] uppercase">
-          Raipur–Bhilai–Durg Corridor
-        </div>
-        
-        {/* Clean styled progress bar */}
-        <div className="w-48 h-[2px] bg-earth-dark border border-dust-brown/30 rounded-full overflow-hidden">
-          <div ref={progressRef} className="h-full bg-dust-brown w-0" />
+        <div className="eyebrow text-haze-grey">Raipur–Bhilai–Durg Corridor</div>
+
+        <div className="h-px w-44 overflow-hidden rounded-full bg-white/10">
+          <div ref={progressRef} className="h-full w-0 bg-dust-brown" />
         </div>
 
-        <div className="text-[10px] text-haze-grey/50 tracking-[0.2em] uppercase mt-2 hover:text-sand-light transition-colors">
-          Click anywhere to skip
+        <div className="mt-1 text-[0.6875rem] tracking-[0.16em] text-haze-grey/55 uppercase">
+          Click to skip
         </div>
       </div>
     </div>

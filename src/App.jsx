@@ -1,47 +1,96 @@
-import { useEffect, useRef, useState, Suspense } from 'react'
+import { useEffect, useRef, useState, useCallback, Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
-import { Stats } from '@react-three/drei'
-import Zone0Entry      from '@components/zones/Zone0Entry'
-import Zone1Land       from '@components/zones/Zone1Land'
-import Zone2People     from '@components/zones/Zone2People'
-import Zone3Science    from '@components/zones/Zone3Science'
-import Zone4Solutions  from '@components/zones/Zone4Solutions'
-import Zone5Pledge     from '@components/zones/Zone5Pledge'
-import Navbar          from '@components/ui/Navbar'
-import LoadingScreen   from '@components/ui/LoadingScreen'
-import ZoneIndicator   from '@components/ui/ZoneIndicator'
-import ErrorBoundary   from '@components/ui/ErrorBoundary'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
-import WorldCamera     from '@components/three/WorldCamera'
-import DustParticles   from '@components/three/DustParticles'
-import TerrainMesh     from '@components/three/TerrainMesh'
-import DustHaze        from '@components/three/DustHaze'
+gsap.registerPlugin(ScrollTrigger)
 
-import Footer          from '@components/ui/Footer'
-import { useAudio }    from '@hooks/useAudio'
+import Zone0Entry from '@components/zones/Zone0Entry'
+import Zone1Land from '@components/zones/Zone1Land'
+import Zone2People from '@components/zones/Zone2People'
+import Zone3Science from '@components/zones/Zone3Science'
+import Zone4Solutions from '@components/zones/Zone4Solutions'
+import Zone5Pledge from '@components/zones/Zone5Pledge'
+import Navbar from '@components/ui/Navbar'
+import LoadingScreen from '@components/ui/LoadingScreen'
+import ZoneIndicator from '@components/ui/ZoneIndicator'
+import ErrorBoundary from '@components/ui/ErrorBoundary'
+import Footer from '@components/ui/Footer'
 
-const ZONE_IDS = ['Zone0Entry', 'Zone1Land', 'Zone2People', 'Zone3Science', 'Zone4Solutions', 'Zone5Pledge']
+import WorldCamera from '@components/three/WorldCamera'
+import DustParticles from '@components/three/DustParticles'
+import TerrainMesh from '@components/three/TerrainMesh'
+import DustHaze from '@components/three/DustHaze'
+
+import { useAudio } from '@hooks/useAudio'
+
+const ZONE_IDS = [
+  'Zone0Entry',
+  'Zone1Land',
+  'Zone2People',
+  'Zone3Science',
+  'Zone4Solutions',
+  'Zone5Pledge',
+]
+
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(false)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setReduced(mq.matches)
+    const handler = (e) => setReduced(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
+
+  return reduced
+}
+
+function useIsMobile() {
+  const [mobile, setMobile] = useState(false)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 768px), (pointer: coarse)')
+    setMobile(mq.matches)
+    const handler = (e) => setMobile(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
+
+  return mobile
+}
 
 export default function App() {
   const [loaded, setLoaded] = useState(false)
   const [activeZone, setActiveZone] = useState(0)
   const [isTouchDevice, setIsTouchDevice] = useState(false)
-  const [isDebug, setIsDebug] = useState(false)
-  
+
   const cursorRef = useRef(null)
   const cursorRingRef = useRef(null)
+  const rafRef = useRef(0)
 
-  const { playWind, stopWind, playStorm, playClean, stopAll } = useAudio()
+  const prefersReducedMotion = usePrefersReducedMotion()
+  const isMobile = useIsMobile()
+
+  const { playWind, stopWind, playStorm, playClean } = useAudio()
+
+  const setZone = useCallback((index) => {
+    setActiveZone(index)
+  }, [])
+
+  const zoneHandlers = useRef({
+    0: () => setZone(0),
+    1: () => setZone(1),
+    2: () => setZone(2),
+    3: () => setZone(3),
+    4: () => setZone(4),
+    5: () => setZone(5),
+  })
 
   useEffect(() => {
-    // Check URL parameters for debug stats
-    const params = new URLSearchParams(window.location.search)
-    setIsDebug(params.has('debug'))
-
-    // Check if device supports touch to disable custom cursor
     const touchCheck = 'ontouchstart' in window || navigator.maxTouchPoints > 0
     setIsTouchDevice(touchCheck)
-
     if (touchCheck) return
 
     let hasMoved = false
@@ -52,16 +101,22 @@ export default function App() {
         if (cursorRef.current) cursorRef.current.style.opacity = '1'
         if (cursorRingRef.current) cursorRingRef.current.style.opacity = '1'
       }
-      if (cursorRef.current) {
-        cursorRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`
-      }
-      if (cursorRingRef.current) {
-        cursorRingRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`
-      }
+
+      cancelAnimationFrame(rafRef.current)
+      rafRef.current = requestAnimationFrame(() => {
+        if (cursorRef.current) {
+          cursorRef.current.style.transform = `translate3d(${e.clientX - 6}px, ${e.clientY - 6}px, 0)`
+        }
+        if (cursorRingRef.current) {
+          cursorRingRef.current.style.transform = `translate3d(${e.clientX - 18}px, ${e.clientY - 18}px, 0)`
+        }
+      })
     }
 
     const handleMouseOver = (e) => {
-      const target = e.target.closest('a, button, input, select, textarea, [role="button"], .cursor-pointer, .solution-card-wrapper')
+      const target = e.target.closest(
+        'a, button, input, select, textarea, [role="button"], .cursor-pointer, .solution-card-wrapper',
+      )
       if (target) {
         cursorRef.current?.classList.add('cursor-hover')
         cursorRingRef.current?.classList.add('cursor-ring-hover')
@@ -69,87 +124,89 @@ export default function App() {
     }
 
     const handleMouseOut = (e) => {
-      const target = e.target.closest('a, button, input, select, textarea, [role="button"], .cursor-pointer, .solution-card-wrapper')
+      const target = e.target.closest(
+        'a, button, input, select, textarea, [role="button"], .cursor-pointer, .solution-card-wrapper',
+      )
       if (target) {
         cursorRef.current?.classList.remove('cursor-hover')
         cursorRingRef.current?.classList.remove('cursor-ring-hover')
       }
     }
-    
-    window.addEventListener('mousemove', move)
+
+    window.addEventListener('mousemove', move, { passive: true })
     window.addEventListener('mouseover', handleMouseOver)
     window.addEventListener('mouseout', handleMouseOut)
 
     return () => {
+      cancelAnimationFrame(rafRef.current)
       window.removeEventListener('mousemove', move)
       window.removeEventListener('mouseover', handleMouseOver)
       window.removeEventListener('mouseout', handleMouseOut)
     }
   }, [])
 
-  // Audio trigger effect based on activeZone
   useEffect(() => {
     if (!loaded) return
 
-    // Standard crossfade mappings
-    if (activeZone === 0) {
-      playWind()
-    } else if (activeZone === 1) {
-      playStorm(0.2)
-    } else if (activeZone >= 2 && activeZone <= 3) {
-      playWind()
-    } else if (activeZone === 4) {
-      stopWind()
-    } else if (activeZone === 5) {
-      playClean()
+    const refresh = () => ScrollTrigger.refresh()
+    const t1 = setTimeout(refresh, 150)
+    const t2 = setTimeout(refresh, 800)
+
+    return () => {
+      clearTimeout(t1)
+      clearTimeout(t2)
     }
+  }, [loaded])
 
-    return () => stopAll()
-  }, [activeZone, loaded, playWind, playStorm, stopWind, playClean, stopAll])
-
-  // Update hash when active zone changes
   useEffect(() => {
     if (!loaded) return
-    window.location.hash = ZONE_IDS[activeZone]
+
+    if (activeZone === 0) playWind()
+    else if (activeZone === 1) playStorm(0.2)
+    else if (activeZone >= 2 && activeZone <= 3) playWind()
+    else if (activeZone === 4) stopWind()
+    else if (activeZone === 5) playClean()
+  }, [activeZone, loaded, playWind, playStorm, stopWind, playClean])
+
+  useEffect(() => {
+    if (!loaded) return
+    const nextHash = ZONE_IDS[activeZone]
+    if (window.location.hash.replace('#', '') !== nextHash) {
+      window.history.replaceState(null, '', `#${nextHash}`)
+    }
   }, [activeZone, loaded])
 
-  // Scroll to hash on mount
   useEffect(() => {
     if (!loaded) return
     const hash = window.location.hash.replace('#', '')
     const targetIdx = ZONE_IDS.indexOf(hash)
     if (targetIdx !== -1) {
       setActiveZone(targetIdx)
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         const el = document.getElementById(hash)
         if (el) el.scrollIntoView({ behavior: 'smooth' })
-      }, 500)
+      })
     }
   }, [loaded])
 
-  // Keyboard navigation listener
   useEffect(() => {
     if (!loaded) return
-    
+
     const handleKeyDown = (e) => {
-      // 1-6 keys jump to zones
       if (e.key >= '1' && e.key <= '6') {
-        const idx = parseInt(e.key) - 1
-        const el = document.getElementById(ZONE_IDS[idx])
-        if (el) el.scrollIntoView({ behavior: 'smooth' })
+        const idx = parseInt(e.key, 10) - 1
+        document.getElementById(ZONE_IDS[idx])?.scrollIntoView({ behavior: 'smooth' })
         return
       }
 
       if (e.key === 'ArrowDown') {
         e.preventDefault()
         const nextIdx = Math.min(activeZone + 1, ZONE_IDS.length - 1)
-        const el = document.getElementById(ZONE_IDS[nextIdx])
-        if (el) el.scrollIntoView({ behavior: 'smooth' })
+        document.getElementById(ZONE_IDS[nextIdx])?.scrollIntoView({ behavior: 'smooth' })
       } else if (e.key === 'ArrowUp') {
         e.preventDefault()
         const prevIdx = Math.max(activeZone - 1, 0)
-        const el = document.getElementById(ZONE_IDS[prevIdx])
-        if (el) el.scrollIntoView({ behavior: 'smooth' })
+        document.getElementById(ZONE_IDS[prevIdx])?.scrollIntoView({ behavior: 'smooth' })
       }
     }
 
@@ -157,9 +214,10 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [activeZone, loaded])
 
+  const show3D = !prefersReducedMotion
+
   return (
     <ErrorBoundary>
-      {/* Custom Cursor (Fine pointer only) */}
       {!isTouchDevice && (
         <>
           <div ref={cursorRef} className="cursor">
@@ -171,38 +229,43 @@ export default function App() {
         </>
       )}
 
-      {/* Loading Gate */}
       {!loaded && <LoadingScreen onComplete={() => setLoaded(true)} />}
 
-      {/* Persistent UI & World */}
       {loaded && (
         <>
           <Navbar activeZone={activeZone} />
           <ZoneIndicator activeZone={activeZone} />
 
-          {/* Global 3D Scene */}
-          <div className="fixed inset-0 z-0 bg-earth-dark pointer-events-none w-full h-full">
-            <Suspense fallback={null}>
-              <Canvas gl={{ antialias: true, powerPreference: "high-performance" }}>
-                <ambientLight intensity={0.6} />
-                <directionalLight position={[10, 15, 5]} intensity={1.2} castShadow />
-                <WorldCamera activeZone={activeZone} />
-                <DustParticles activeZone={activeZone} />
-                <TerrainMesh activeZone={activeZone} />
-                <DustHaze activeZone={activeZone} />
-                {isDebug && <Stats />}
-              </Canvas>
-            </Suspense>
-          </div>
+          {show3D && (
+            <div className="fixed inset-0 z-0 pointer-events-none w-full h-full bg-earth-dark opacity-40">
+              <Suspense fallback={null}>
+                <Canvas
+                  dpr={isMobile ? [1, 1.25] : [1, 1.5]}
+                  gl={{
+                    antialias: !isMobile,
+                    powerPreference: 'high-performance',
+                    alpha: false,
+                  }}
+                  camera={{ position: [0, 2, 15], fov: 45, near: 0.1, far: 200 }}
+                >
+                  <ambientLight intensity={0.55} />
+                  <directionalLight position={[10, 15, 5]} intensity={1} />
+                  <WorldCamera activeZone={activeZone} />
+                  <DustParticles activeZone={activeZone} lowPower={isMobile} />
+                  <TerrainMesh activeZone={activeZone} lowPower={isMobile} />
+                  <DustHaze activeZone={activeZone} />
+                </Canvas>
+              </Suspense>
+            </div>
+          )}
 
-          {/* World Journey */}
           <main className="relative z-10 w-full">
-            <Zone0Entry     onEnter={() => setActiveZone(0)} />
-            <Zone1Land      onEnter={() => setActiveZone(1)} />
-            <Zone2People    onEnter={() => setActiveZone(2)} />
-            <Zone3Science   onEnter={() => setActiveZone(3)} />
-            <Zone4Solutions onEnter={() => setActiveZone(4)} />
-            <Zone5Pledge    onEnter={() => setActiveZone(5)} />
+            <Zone0Entry onEnter={zoneHandlers.current[0]} />
+            <Zone1Land onEnter={zoneHandlers.current[1]} />
+            <Zone2People onEnter={zoneHandlers.current[2]} />
+            <Zone3Science onEnter={zoneHandlers.current[3]} />
+            <Zone4Solutions onEnter={zoneHandlers.current[4]} />
+            <Zone5Pledge onEnter={zoneHandlers.current[5]} />
             <Footer />
           </main>
         </>

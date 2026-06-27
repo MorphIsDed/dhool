@@ -61,12 +61,15 @@ export default function Zone3Science({ onEnter }) {
   }, [currentPm10, currentAqi, loading])
 
   useEffect(() => {
-    if (titleRef.current) {
-      animateTextIn(titleRef.current, 0.2)
-    }
+    const titleTween = titleRef.current ? animateTextIn(titleRef.current, 0.15) : null
+    let revealCleanup = () => {}
     if (panelsRef.current) {
       const cards = panelsRef.current.querySelectorAll('.science-card')
-      scrollReveal(cards, { stagger: 0.15 })
+      revealCleanup = scrollReveal(cards, { stagger: 0.12 })
+    }
+    return () => {
+      titleTween?.kill()
+      revealCleanup()
     }
   }, [])
 
@@ -89,137 +92,163 @@ export default function Zone3Science({ onEnter }) {
   const pmOffset = circ - pmPercent * circ
 
   return (
-    <section ref={zoneRef} className="zone flex flex-col items-center justify-center min-h-screen py-24 bg-black/40 backdrop-blur-sm" id="Zone3Science">
-      <div className="max-w-6xl w-full px-6">
-        
-        <div className="text-center mb-16">
-          <h2 
-            ref={titleRef}
-            className="text-4xl md:text-5xl font-bold text-sand-light mb-6"
-          >
-            The Measurement Blindspot
-          </h2>
-          <p className="text-sm md:text-base text-haze-grey max-w-3xl mx-auto leading-relaxed">
-            Standard AQI is heavily weighted towards fine particles (PM2.5) and gases. In industrial zones, coarse dust (PM10) is the hidden killer that standard meters often downplay.
-          </p>
-        </div>
+    <section ref={zoneRef} className="zone zone-surface editorial-section overflow-hidden" id="Zone3Science">
+      <div className="section-shell relative z-10">
+        <div className="w-full">
+          <div className="mx-auto mb-10 max-w-2xl text-center md:mb-12">
+            <div className="mb-5 flex justify-center">
+              <span className="zone-badge">Why the numbers miss the dust</span>
+            </div>
+            <h2 ref={titleRef} className="section-title">
+              The Measurement Blindspot
+            </h2>
+            <p className="mx-auto mt-5 max-w-xl text-muted md:text-base">
+              Standard AQI is weighted toward PM2.5 and gases. In industrial corridors, coarse dust (PM10) is the hidden load that often stays out of frame.
+            </p>
+          </div>
 
-        {/* Gauge Split Screen */}
-        <div ref={panelsRef} className="flex flex-col md:flex-row gap-8 mb-16">
-          
-          {/* Left: Standard AQI */}
-          <div className="science-card flex-1 bg-earth-dark/95 border border-white/10 rounded-2xl p-8 flex flex-col items-center text-center">
-            <h3 className="text-base font-mono text-haze-grey mb-6 tracking-widest uppercase">Standard AQI</h3>
-            
-            {/* SVG Circular Arc Gauge */}
-            <div className="relative w-44 h-44 flex items-center justify-center mb-6">
-              <svg className="w-full h-full -rotate-90" viewBox="0 0 176 176">
-                <circle 
-                  cx="88" cy="88" r={radius} 
-                  className="stroke-white/5 fill-none" 
-                  strokeWidth="6" 
-                />
-                <circle 
-                  cx="88" cy="88" r={radius} 
-                  className="fill-none transition-[stroke-dashoffset] duration-300 ease-out" 
-                  strokeWidth="6" 
-                  strokeDasharray={circ}
-                  strokeDashoffset={aqiOffset}
-                  strokeLinecap="round"
-                  style={{ stroke: aqiColor }}
-                />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-4xl font-mono font-bold" style={{ color: aqiColor }}>
-                  {loading ? '...' : animatedAqi}
-                </span>
-                <span className="text-[10px] font-mono uppercase tracking-widest mt-1 text-haze-grey">Index</span>
+          <div ref={panelsRef} className="grid gap-6 lg:grid-cols-2 lg:gap-8">
+            <div className="science-card zone-panel p-6 md:p-7">
+              <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
+                <div>
+                  <div className="eyebrow">Standard AQI</div>
+                  <div className="mt-2 text-lg font-semibold text-sand-light">The headline number</div>
+                </div>
+                <span className="zone-badge">Weighted down</span>
+              </div>
+
+              <div className="mt-7 flex flex-col items-center text-center">
+                <div className="relative mb-6 h-44 w-44">
+                  <svg className="h-full w-full -rotate-90" viewBox="0 0 176 176">
+                    <circle
+                      cx="88"
+                      cy="88"
+                      r={radius}
+                      className="fill-none stroke-white/5"
+                      strokeWidth="6"
+                    />
+                    <circle
+                      cx="88"
+                      cy="88"
+                      r={radius}
+                      className="fill-none transition-[stroke-dashoffset] duration-300 ease-out"
+                      strokeWidth="6"
+                      strokeDasharray={circ}
+                      strokeDashoffset={aqiOffset}
+                      strokeLinecap="round"
+                      style={{ stroke: aqiColor }}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-4xl font-mono font-bold" style={{ color: aqiColor }}>
+                      {loading ? '...' : animatedAqi}
+                    </span>
+                    <span className="mt-1 text-[10px] font-mono uppercase tracking-widest text-haze-grey">Index</span>
+                  </div>
+                </div>
+                <div className="text-xl font-bold tracking-wide" style={{ color: aqiColor }}>
+                  {aqiSeverity}
+                </div>
+                <p className="mt-4 max-w-sm text-xs leading-relaxed text-haze-grey">
+                  AQI can still look manageable while coarse dust is already coating roads, stalls, and schoolyards.
+                </p>
               </div>
             </div>
 
-            <div className="text-xl font-bold tracking-wide" style={{ color: aqiColor }}>{aqiSeverity}</div>
-            <p className="text-xs text-haze-grey mt-4 leading-relaxed max-w-xs">Often looks "Moderate" even when dust is choking the streets.</p>
-          </div>
+            <div className="science-card zone-panel relative overflow-hidden p-6 md:p-7">
+              {currentPm10 > 250 && <div className="absolute inset-0 pointer-events-none bg-rust-red/5" />}
+              <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
+                <div>
+                  <div className="eyebrow">True PM10</div>
+                  <div className="mt-2 text-lg font-semibold text-sand-light">The buried signal</div>
+                </div>
+                <span className="zone-badge border-rust-red/25 text-rust-red/85">Corridor pressure</span>
+              </div>
 
-          {/* Right: True PM10 */}
-          <div className="science-card flex-1 bg-earth-dark/95 border border-white/10 rounded-2xl p-8 flex flex-col items-center text-center relative overflow-hidden">
-            {currentPm10 > 250 && <div className="absolute inset-0 bg-rust-red/5 animate-pulse pointer-events-none" />}
-            <h3 className="text-base font-mono text-haze-grey mb-6 tracking-widest uppercase">True PM10</h3>
-            
-            {/* SVG Circular Arc Gauge */}
-            <div className="relative w-44 h-44 flex items-center justify-center mb-6">
-              <svg className="w-full h-full -rotate-90" viewBox="0 0 176 176">
-                <circle 
-                  cx="88" cy="88" r={radius} 
-                  className="stroke-white/5 fill-none" 
-                  strokeWidth="6" 
-                />
-                <circle 
-                  cx="88" cy="88" r={radius} 
-                  className="fill-none transition-[stroke-dashoffset] duration-300 ease-out" 
-                  strokeWidth="6" 
-                  strokeDasharray={circ}
-                  strokeDashoffset={pmOffset}
-                  strokeLinecap="round"
-                  style={{ stroke: pm10Color }}
-                />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-4xl font-mono font-bold" style={{ color: pm10Color }}>
-                  {loading ? '...' : animatedPm10}
-                </span>
-                <span className="text-[10px] font-mono uppercase tracking-widest mt-1 text-haze-grey">µg/m³</span>
+              <div className="mt-7 flex flex-col items-center text-center">
+                <div className="relative mb-6 h-44 w-44">
+                  <svg className="h-full w-full -rotate-90" viewBox="0 0 176 176">
+                    <circle
+                      cx="88"
+                      cy="88"
+                      r={radius}
+                      className="fill-none stroke-white/5"
+                      strokeWidth="6"
+                    />
+                    <circle
+                      cx="88"
+                      cy="88"
+                      r={radius}
+                      className="fill-none transition-[stroke-dashoffset] duration-300 ease-out"
+                      strokeWidth="6"
+                      strokeDasharray={circ}
+                      strokeDashoffset={pmOffset}
+                      strokeLinecap="round"
+                      style={{ stroke: pm10Color }}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-4xl font-mono font-bold" style={{ color: pm10Color }}>
+                      {loading ? '...' : animatedPm10}
+                    </span>
+                    <span className="mt-1 text-[10px] font-mono uppercase tracking-widest text-haze-grey">µg/m³</span>
+                  </div>
+                </div>
+                <div className="text-xl font-bold tracking-wide" style={{ color: pm10Color }}>
+                  {pm10Severity}
+                </div>
+                <p className="mt-4 max-w-sm text-xs leading-relaxed text-haze-grey">
+                  The corridor frequently doubles the standard safe limit of 100 µg/m³ in dry, high-traffic months.
+                </p>
               </div>
             </div>
-
-            <div className="text-xl font-bold tracking-wide" style={{ color: pm10Color }}>{pm10Severity}</div>
-            <p className="text-xs text-haze-grey mt-4 leading-relaxed max-w-xs">Standard safe limit is 100 µg/m³. The corridor frequently doubles this.</p>
           </div>
 
-        </div>
+          <div className="mx-auto mt-8 max-w-2xl zone-panel p-6">
+            <label className="mb-4 block text-center font-mono text-xs uppercase tracking-[0.18em] text-sand-light">
+              Seasonal simulation: {mults.label}
+            </label>
+            <input 
+              type="range" 
+              min="0" max="3" step="1" 
+              value={seasonIdx}
+              onChange={(e) => setSeasonIdx(parseInt(e.target.value))}
+              className="h-1 w-full cursor-pointer rounded-lg bg-white/10 accent-dust-brown focus:outline-none"
+              aria-label="Season slider"
+            />
+            <div className="mt-4 grid grid-cols-4 gap-2 text-center text-[10px] font-mono uppercase tracking-wider text-haze-grey">
+              <span>Monsoon</span>
+              <span>Post-monsoon</span>
+              <span>Winter</span>
+              <span>Summer</span>
+            </div>
 
-        {/* Season Slider */}
-        <div className="max-w-2xl mx-auto bg-earth-dark/80 p-6 rounded-xl border border-dust-brown/20 shadow-xl">
-          <label className="block text-center text-sand-light font-mono text-xs mb-6 uppercase tracking-widest">
-            Simulate Seasonal Impact: {mults.label}
-          </label>
-          <input 
-            type="range" 
-            min="0" max="3" step="1" 
-            value={seasonIdx}
-            onChange={(e) => setSeasonIdx(parseInt(e.target.value))}
-            className="w-full accent-dust-brown h-1 bg-white/10 rounded-lg appearance-none cursor-pointer focus:outline-none"
-            aria-label="Season slider"
-          />
-          <div className="flex justify-between text-[10px] font-mono text-haze-grey mt-4 px-1 uppercase tracking-wider">
-            <span>Monsoon</span>
-            <span>Post-Monsoon</span>
-            <span>Winter</span>
-            <span>Summer</span>
-          </div>
+            <div className="mt-6 flex items-center justify-center gap-2 border-t border-white/5 pt-4 text-[10px] font-mono">
+              {loading ? (
+                <span className="text-haze-grey/70 animate-pulse">Querying live sensor stations...</span>
+              ) : error || data?.fallback ? (
+                <div className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-rust-red/60" />
+                  <span className="text-haze-grey/80">Cached snapshot - Raipur center</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <span className="relative flex h-1.5 w-1.5">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-hope opacity-75" />
+                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-green-hope" />
+                  </span>
+                  <span className="text-green-hope">Live OpenAQ feed - Raipur (8673)</span>
+                </div>
+              )}
+            </div>
 
-          {/* Dynamic Data Connection Status Badge */}
-          <div className="flex items-center justify-center gap-2 mt-6 border-t border-white/5 pt-4 text-[10px] font-mono">
-            {loading ? (
-              <span className="text-haze-grey/70 animate-pulse">Querying live sensor stations...</span>
-            ) : error || data?.fallback ? (
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-rust-red/60" />
-                <span className="text-haze-grey/80">Cached Snapshot &bull; Raipur Center</span>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                <span className="relative flex h-1.5 w-1.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-hope opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-hope"></span>
-                </span>
-                <span className="text-green-hope">Live OpenAQ Feed &bull; Raipur (8673)</span>
+            {error && (
+              <div className="mt-4 text-center text-[9px] font-mono text-rust-red/60">
+                API connection offline, loaded static historical model.
               </div>
             )}
           </div>
         </div>
-
-        {error && <div className="text-center text-[9px] text-rust-red mt-4 opacity-50 font-mono">API Connection offline, loaded static historical model.</div>}
       </div>
     </section>
   )

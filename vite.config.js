@@ -16,6 +16,21 @@ export default defineConfig({
     },
   },
   build: {
-    chunkSizeWarningLimit: 1200 // Raise limit since Leaflet and Three.js are naturally large
-  }
+    chunkSizeWarningLimit: 900,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules/three') || id.includes('@react-three')) {
+            return 'three'
+          }
+          if (id.includes('node_modules/gsap')) {
+            return 'gsap'
+          }
+          if (id.includes('node_modules/leaflet') || id.includes('mapHelpers')) {
+            return 'map'
+          }
+        },
+      },
+    },
+  },
 })

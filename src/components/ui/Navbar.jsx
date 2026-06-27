@@ -17,7 +17,7 @@ export default function Navbar({ activeZone }) {
   return (
     <nav 
       aria-label="Main Navigation" 
-      className="fixed top-0 left-0 right-0 z-[1000] flex justify-between items-center px-6 md:px-8 py-4 bg-earth-dark/80 backdrop-blur-md border-b border-dust-brown/20"
+      className="fixed top-0 right-0 left-0 z-[1000] flex items-center justify-between border-b border-white/10 bg-[#1a0e09]/95 px-5 py-3.5 backdrop-blur-md md:px-8"
     >
       {/* Title logo */}
       <div 
@@ -35,7 +35,7 @@ export default function Navbar({ activeZone }) {
             href={`#${ZONE_IDS[i]}`}
             onClick={(e) => handleScroll(e, i)}
             aria-current={activeZone === i ? 'page' : undefined}
-            className={`text-xs tracking-widest uppercase transition-colors duration-300 font-medium relative pb-1.5 ${
+            className={`relative pb-1 text-xs font-medium tracking-[0.14em] uppercase transition-colors ${
               activeZone === i ? 'text-particle-glow' : 'text-haze-grey hover:text-sand-light'
             }`}
           >

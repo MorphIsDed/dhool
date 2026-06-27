@@ -16,76 +16,92 @@ export default function Zone5Pledge({ onEnter }) {
   }
 
   useEffect(() => {
+    let revealCleanup = () => {}
     if (containerRef.current) {
       const children = containerRef.current.querySelectorAll('.scroll-target')
-      scrollReveal(children)
+      revealCleanup = scrollReveal(children, { stagger: 0.1 })
     }
+    return () => revealCleanup()
   }, [])
 
   return (
-    <section 
-      ref={zoneRef} 
-      className="zone flex flex-col items-center justify-center min-h-screen relative overflow-hidden" 
-      id="Zone5Pledge"
-    >
-      {/* Green World Shift Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-green-hope/30 to-transparent mix-blend-color pointer-events-none transition-opacity duration-1000" />
-      <div className="absolute inset-0 bg-earth-dark/75 backdrop-blur-sm pointer-events-none" />
+    <section ref={zoneRef} className="zone zone-surface editorial-section overflow-hidden" id="Zone5Pledge">
+      <div ref={containerRef} className="section-shell relative z-10">
+        <div className="grid w-full gap-8 lg:grid-cols-2">
+          <div className="scroll-target zone-panel p-7 md:p-8">
+            <span className="zone-badge border-green-hope/30 text-green-hope">Final action</span>
+            <h2 className="mt-6 text-3xl font-semibold text-sand-light md:text-4xl">Clear the Air</h2>
+            <p className="mt-5 max-w-md text-body">
+              Change begins when residents demand it and institutions act on it. Add your name to the community pledge and back the corridor plan.
+            </p>
 
-      <div 
-        ref={containerRef}
-        className="max-w-3xl w-full px-6 relative z-10 text-center"
-      >
-        <h2 className="scroll-target text-5xl md:text-6xl font-bold text-sand-light mb-6 drop-shadow-lg">
-          Clear the Air
-        </h2>
-        <p className="scroll-target text-base md:text-lg text-ui-cream mb-12 font-light leading-relaxed max-w-xl mx-auto">
-          Change begins when citizens demand it and authorities act on it. Add your name to the community pledge.
-        </p>
+            <div className="mt-8 grid gap-3">
+              {[
+                'Demand dust suppression at worksites and unpaved roads.',
+                'Report the sources that keep PM10 visible and unchallenged.',
+                'Protect daily routines with informed, shared action.',
+              ].map((item, idx) => (
+                <div key={item} className="flex gap-4 rounded-lg border border-white/10 bg-black/20 p-4">
+                  <div className="shrink-0 font-mono text-sm text-dust-brown">{String(idx + 1).padStart(2, '0')}</div>
+                  <p className="text-sm text-muted">{item}</p>
+                </div>
+              ))}
+            </div>
+          </div>
 
-        {/* Pledge Form */}
-        <div className="scroll-target">
-          {!pledged ? (
-            <div className="flex flex-col md:flex-row gap-4 justify-center items-center mb-16 max-w-lg mx-auto">
-              <input 
-                type="text" 
-                placeholder="Enter your name" 
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                aria-label="Your full name for the pledge"
-                className="px-6 py-4 rounded-full bg-white/5 border border-white/15 text-ui-cream placeholder-haze-grey/60 focus:outline-none focus:border-green-hope focus:ring-1 focus:ring-green-hope w-full text-base transition-all duration-300"
-              />
+          <div className="scroll-target zone-panel p-6 md:p-7">
+            <div className="mb-5 flex items-center justify-between border-b border-white/10 pb-4">
+              <div>
+                <div className="eyebrow">Community pledge</div>
+                <div className="mt-2 text-xl font-semibold text-sand-light">Sign your name</div>
+              </div>
+              <span className="zone-badge">Public record</span>
+            </div>
+
+            {!pledged ? (
+              <div className="space-y-4">
+                <input 
+                  type="text" 
+                  placeholder="Enter your name" 
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  aria-label="Your full name for the pledge"
+                  className="w-full rounded-2xl border border-white/15 bg-white/5 px-5 py-4 text-base text-ui-cream placeholder-haze-grey/60 transition-all duration-300 focus:border-green-hope focus:outline-none focus:ring-1 focus:ring-green-hope"
+                />
+                <button 
+                  onClick={() => name.trim() && setPledged(true)}
+                  disabled={!name.trim()}
+                  aria-label="Sign the digital dust pledge"
+                  className="w-full rounded-2xl bg-dust-brown px-6 py-4 font-bold text-earth-dark shadow-lg transition-all duration-300 hover:bg-sand-light disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Sign Pledge
+                </button>
+                <p className="text-xs leading-relaxed text-haze-grey/80">
+                  Your name is a civic signal, not a donation. It helps show that the corridor wants cleaner air now.
+                </p>
+              </div>
+            ) : (
+              <div className="animate-fade-in rounded-2xl border border-green-hope/40 bg-green-hope/15 p-8 shadow-2xl">
+                <h3 className="mb-2 text-xl font-bold text-sand-light">Thank you, {name}.</h3>
+                <p className="text-sm leading-relaxed text-ui-cream/90">
+                  Your commitment has been added. Together, we can push for cleaner air in the Raipur-Bhilai-Durg corridor.
+                </p>
+              </div>
+            )}
+
+            <div className="mt-8 border-t border-white/10 pt-6">
+              <p className="text-xs leading-relaxed text-haze-grey">
+                Are you a municipal authority, developer, or policymaker? Open the structured clean-air brief for a printable summary.
+              </p>
               <button 
-                onClick={() => name.trim() && setPledged(true)}
-                disabled={!name.trim()}
-                aria-label="Sign the digital dust pledge"
-                className="px-8 py-4 rounded-full bg-dust-brown text-earth-dark font-bold hover:bg-sand-light transition-all duration-300 w-full md:w-auto disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-lg hover:shadow-dust-brown/20"
+                onClick={handlePrint}
+                aria-label="Download PDF Policy Brief"
+                className="mt-4 rounded-xl border border-dust-brown px-6 py-3 font-mono text-xs uppercase tracking-widest text-dust-brown transition-all duration-300 hover:bg-dust-brown hover:text-earth-dark"
               >
-                Sign Pledge
+                Download PDF Policy Brief
               </button>
             </div>
-          ) : (
-            <div className="mb-16 p-8 bg-green-hope/15 border border-green-hope/40 rounded-2xl animate-fade-in max-w-lg mx-auto shadow-2xl backdrop-blur-md">
-              <h3 className="text-xl font-bold text-sand-light mb-2">Thank you, {name}.</h3>
-              <p className="text-sm text-ui-cream/90 leading-relaxed">
-                Your commitment has been added. Together, we can push for cleaner air in the Raipur–Bhilai–Durg corridor.
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Policy Brief Download */}
-        <div className="scroll-target border-t border-white/10 pt-8 mt-8 max-w-xl mx-auto">
-          <p className="text-xs text-haze-grey mb-6 tracking-wide leading-relaxed">
-            Are you a municipal authority, developer, or policymaker? Access the full, structured clean air plan.
-          </p>
-          <button 
-            onClick={handlePrint}
-            aria-label="Download PDF Policy Brief"
-            className="px-6 py-3 rounded-lg border border-dust-brown text-dust-brown hover:bg-dust-brown hover:text-earth-dark transition-all duration-300 font-mono text-xs tracking-widest uppercase cursor-pointer"
-          >
-            Download PDF Policy Brief
-          </button>
+          </div>
         </div>
       </div>
 

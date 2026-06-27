@@ -1,34 +1,45 @@
 export default function Footer() {
   return (
-    <footer className="w-full bg-earth-dark/95 border-t border-white/5 py-8 px-6 text-center select-none z-20 relative">
-      <div className="max-w-4xl mx-auto flex flex-col items-center gap-6">
-        
-        {/* Logo and Tagline */}
-        <div className="flex flex-col items-center gap-2">
-          <span 
-            className="text-xl font-bold text-dust-brown"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
-            धूल / DHOOL
-          </span>
-          <p className="text-[10px] text-haze-grey uppercase tracking-widest">
-            Raipur–Bhilai–Durg Corridor Pollution Project
-          </p>
+    <footer className="relative z-20 w-full border-t border-white/10 bg-[#140a06] py-14">
+      <div className="section-shell">
+        <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr_0.8fr]">
+          <div className="space-y-3">
+            <div className="text-2xl font-semibold text-dust-brown" style={{ fontFamily: 'var(--font-display)' }}>
+              धूल / DHOOL
+            </div>
+            <p className="max-w-md text-sm text-muted">
+              A visual chronicle of dust exposure in the Raipur-Bhilai-Durg corridor — built to turn air quality data into public pressure and practical action.
+            </p>
+          </div>
+
+          <div>
+            <div className="eyebrow text-sand-light/75">Sources</div>
+            <ul className="mt-4 space-y-2.5 text-sm text-muted">
+              <li>National Air Quality Index, CPCB India</li>
+              <li>OpenAQ v3 live feeds, Station 8673</li>
+              <li>Raipur Municipal Corporation budget briefs</li>
+              <li>Chhattisgarh State Environment Conservation Board reports</li>
+              <li>Composite citizen field journals</li>
+            </ul>
+          </div>
+
+          <div>
+            <div className="eyebrow text-sand-light/75">Navigate</div>
+            <ul className="mt-4 grid grid-cols-2 gap-2 text-sm text-muted lg:grid-cols-1">
+              <li><a className="transition-colors hover:text-sand-light" href="#Zone0Entry">Entry</a></li>
+              <li><a className="transition-colors hover:text-sand-light" href="#Zone1Land">The Land</a></li>
+              <li><a className="transition-colors hover:text-sand-light" href="#Zone2People">The People</a></li>
+              <li><a className="transition-colors hover:text-sand-light" href="#Zone3Science">The Science</a></li>
+              <li><a className="transition-colors hover:text-sand-light" href="#Zone4Solutions">Solutions</a></li>
+              <li><a className="transition-colors hover:text-sand-light" href="#Zone5Pledge">Pledge</a></li>
+            </ul>
+          </div>
         </div>
 
-        {/* Data Source Citations */}
-        <div className="text-[10px] text-haze-grey/60 max-w-xl leading-relaxed font-mono">
-          Data Sources: National Air Quality Index (CPCB India), OpenAQ v3 Real-time feeds (Station 8673), Raipur Municipal Corporation budget briefs, Chhattisgarh State Environment Conservation Board reports, and composite citizen field journals.
+        <div className="mt-10 flex flex-col gap-3 border-t border-white/10 pt-5 text-xs text-haze-grey/60 md:flex-row md:items-center md:justify-between">
+          <span>&copy; {new Date().getFullYear()} DHOOL</span>
+          <span className="font-mono">React · Three.js · Leaflet · Open data</span>
         </div>
-
-        {/* Copyright & Credit */}
-        <div className="text-[10px] text-haze-grey/40 border-t border-white/5 pt-6 w-full flex flex-col md:flex-row justify-between items-center gap-4">
-          <span>&copy; {new Date().getFullYear()} DHOOL. All rights reserved.</span>
-          <span className="font-mono hover:text-sand-light transition-colors cursor-pointer">
-            Engineered with React + Three.js + Leaflet
-          </span>
-        </div>
-
       </div>
     </footer>
   )

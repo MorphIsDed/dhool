@@ -1,84 +1,73 @@
 import { useEffect, useRef } from 'react'
 import { useScrollZone } from '@hooks/useScrollZone'
-import { animateTextIn, parallaxDrift } from '@utils/gsapHelpers'
+import { animateTextIn } from '@utils/gsapHelpers'
+
+const PROJECT_FACTS = [
+  ['01', 'Pollutant', 'PM10 / coarse dust'],
+  ['02', 'Geography', 'Raipur-Bhilai-Durg'],
+  ['03', 'Purpose', 'Evidence into action'],
+]
 
 export default function Zone0Entry({ onEnter }) {
   const zoneRef = useScrollZone(onEnter, 0)
   const titleRef = useRef(null)
-  const taglineRef = useRef(null)
-  const promptRef = useRef(null)
 
   useEffect(() => {
-    // Wait slightly for loading screen to clear
-    const timeout = setTimeout(() => {
-      if (titleRef.current) animateTextIn(titleRef.current, 0.2)
-      if (taglineRef.current) {
-        animateTextIn(taglineRef.current, 0.8)
-        // Add parallax drift scroll binding
-        parallaxDrift(taglineRef.current, 0.5)
-      }
-      if (promptRef.current) animateTextIn(promptRef.current, 1.4)
-    }, 500)
-    
+    const timeout = setTimeout(() => animateTextIn(titleRef.current, 0.1), 200)
     return () => clearTimeout(timeout)
   }, [])
 
   return (
-    <section 
-      ref={zoneRef} 
-      className="zone min-h-[150vh] relative w-full" 
-      id="Zone0Entry"
-    >
-      {/* Vignette Overlay */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_20%,var(--color-earth-dark)_90%)] pointer-events-none z-[1]" />
+    <section ref={zoneRef} className="zone relative flex min-h-[100svh] items-center overflow-hidden py-28" id="Zone0Entry">
+      <div className="absolute inset-0 z-[1] bg-[linear-gradient(105deg,rgba(26,14,9,0.97)_0%,rgba(26,14,9,0.72)_45%,rgba(26,14,9,0.88)_100%)]" />
 
-      {/* Sticky viewport container centered for scrollytelling visual stability */}
-      <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-between py-20 px-6 pointer-events-none">
-        
-        {/* Spacer to push title content down slightly */}
-        <div className="h-0 md:h-[10vh]" />
-
-        {/* Title & Tagline Content */}
-        <div className="max-w-4xl px-4 select-none pointer-events-auto z-10 text-center">
-          <h1 
-            ref={titleRef} 
-            className="text-7xl md:text-9xl font-bold tracking-[0.15em] text-dust mb-6 drop-shadow-2xl" 
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
-            DHOOL / धूल
-          </h1>
-          
-          <p 
-            ref={taglineRef} 
-            className="text-xl md:text-2xl text-haze-grey font-light tracking-wide"
-          >
-            Step into the air of Raipur–Bhilai–Durg
-          </p>
-        </div>
-
-        {/* Downward Scrolling Indicator */}
-        <div 
-          ref={promptRef} 
-          className="flex flex-col items-center gap-4 z-10 select-none opacity-0 pointer-events-auto"
-        >
-          <span className="text-[10px] text-sand-light tracking-[0.25em] uppercase opacity-60">
-            Scroll down to enter
-          </span>
-          
-          {/* Pulsing ring wrapping the bouncing chevron */}
-          <div className="w-10 h-10 rounded-full border border-dust-brown/30 flex items-center justify-center bg-earth-dark/40 backdrop-blur-md shadow-[0_0_15px_rgba(196,149,106,0.1)] hover:border-dust-brown/60 transition-colors duration-300">
-            <svg 
-              className="w-4 h-4 text-sand-light animate-bounce" 
-              fill="none" 
-              stroke="currentColor" 
-              strokeWidth="2.5" 
-              viewBox="0 0 24 24"
+      <div className="section-shell relative z-10">
+        <div className="grid items-end gap-16 lg:grid-cols-[1.05fr_0.95fr] lg:gap-24">
+          <div>
+            <div className="eyebrow mb-7">Raipur-Bhilai-Durg corridor</div>
+            <h1
+              ref={titleRef}
+              className="max-w-2xl text-[clamp(3.5rem,8.5vw,6.5rem)] font-bold leading-[0.9] tracking-[0.01em] text-dust"
+              style={{ fontFamily: 'var(--font-display)' }}
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-            </svg>
+              <span className="block">DHOOL</span>
+              <span className="mt-4 block text-[0.55em] tracking-normal">धूल</span>
+            </h1>
+            <p className="mt-10 max-w-lg text-lg leading-relaxed text-body md:text-xl">
+              A visual investigation of the dust people breathe across Chhattisgarh's industrial corridor.
+            </p>
           </div>
-        </div>
 
+          <aside className="border-l border-dust-brown/40 pl-8 md:pl-10">
+            <div className="eyebrow">Field note 01</div>
+            <h2 className="mt-5 max-w-sm text-2xl font-semibold leading-snug text-sand-light md:text-[1.75rem]">
+              The air looks ordinary. The exposure is not.
+            </h2>
+            <p className="mt-5 max-w-sm text-muted">
+              Follow the evidence from mapped hotspots and lived experience to measurement gaps and practical interventions.
+            </p>
+
+            <dl className="mt-10 divide-y divide-white/12 border-y border-white/12">
+              {PROJECT_FACTS.map(([number, label, value]) => (
+                <div key={number} className="grid grid-cols-[2.5rem_1fr] gap-4 py-4">
+                  <dt className="font-mono text-xs text-dust-brown">{number}</dt>
+                  <dd className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between">
+                    <span className="text-sm text-muted">{label}</span>
+                    <strong className="text-sm font-medium text-ui-cream">{value}</strong>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+
+            <a
+              href="#Zone1Land"
+              className="mt-9 inline-flex items-center gap-2 text-sm font-medium text-sand-light transition-colors hover:text-particle-glow"
+            >
+              Enter the chronicle
+              <span aria-hidden="true">↓</span>
+            </a>
+          </aside>
+        </div>
       </div>
     </section>
   )

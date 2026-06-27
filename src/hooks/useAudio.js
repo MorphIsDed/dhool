@@ -1,99 +1,106 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
 import { Howl } from 'howler'
 
 const AUDIO_CONFIG = {
-  wind:  { src: ['/sounds/wind-ambient.mp3'],  loop: true, volume: 0.15 },
-  storm: { src: ['/sounds/dust-storm.mp3'],    loop: true, volume: 0.0  },
-  clean: { src: ['/sounds/birds-nature.mp3'],  loop: true, volume: 0.0  },
+  wind: { src: ['/sounds/wind-ambient.mp3'], loop: true, volume: 0.12 },
+  storm: { src: ['/sounds/dust-storm.mp3'], loop: true, volume: 0 },
+  clean: { src: ['/sounds/birds-nature.mp3'], loop: true, volume: 0 },
+}
+
+function safeFade(sound, from, to, duration) {
+  if (!sound) return
+  try {
+    sound.fade(from, to, duration)
+  } catch {
+    sound.volume(to)
+  }
 }
 
 export function useAudio() {
   const sounds = useRef({})
+  const mounted = useRef(true)
 
   useEffect(() => {
-    // Initialise sounds lazily with load guards
-    const initSound = (key, config) => {
+    mounted.current = true
+
+    Object.entries(AUDIO_CONFIG).forEach(([key, config]) => {
       try {
         sounds.current[key] = new Howl({
           ...config,
-          preload: false, // Don't block initial page load
-          onloaderror: (id, error) => {
-            console.warn(`Audio file ${config.src[0]} failed to load. Guards active.`, error)
+          preload: false,
+          onloaderror: (_id, error) => {
+            console.warn(`Audio ${config.src[0]} unavailable.`, error)
           },
-          onplayerror: (id, error) => {
-            console.warn(`Playback failed for ${config.src[0]}`, error)
-          }
         })
       } catch (err) {
-        console.warn(`Howler instantiation failed for ${key}:`, err)
+        console.warn(`Howler init failed for ${key}:`, err)
       }
-    }
-
-    initSound('wind', AUDIO_CONFIG.wind)
-    initSound('storm', AUDIO_CONFIG.storm)
-    initSound('clean', AUDIO_CONFIG.clean)
-
-    const activeSounds = sounds.current
+    })
 
     return () => {
-      Object.values(activeSounds).forEach(s => {
-        if (s && typeof s.unload === 'function') {
-          s.unload()
-        }
+      mounted.current = false
+      Object.values(sounds.current).forEach((s) => {
+        if (s?.unload) s.unload()
       })
+      sounds.current = {}
     }
   }, [])
 
-  const playWind = () => {
-    const s = sounds.current.wind
-    if (!s) return
+  const playWind = useCallback(() => {
+    const wind = sounds.current.wind
+    const storm = sounds.current.storm
+    const clean = sounds.current.clean
+    if (!wind) return
+
     try {
-      if (!s.playing()) {
-        s.play()
-      }
+      if (!wind.playing()) wind.play()
+      safeFade(wind, wind.volume(), 0.12, 800)
+      safeFade(storm, storm?.volume() ?? 0, 0, 600)
+      safeFade(clean, clean?.volume() ?? 0, 0, 600)
     } catch (e) {
       console.warn(e)
     }
-  }
+  }, [])
 
-  const stopWind = () => {
-    const s = sounds.current.wind
-    if (s && s.playing()) {
-      s.fade(0.15, 0, 1000)
-    }
-  }
+  const stopWind = useCallback(() => {
+    safeFade(sounds.current.wind, sounds.current.wind?.volume() ?? 0.12, 0, 900)
+  }, [])
 
-  const playStorm = (vol = 0.3) => {
-    const s = sounds.current.storm
-    if (!s) return
+  const playStorm = useCallback((vol = 0.22) => {
+    const wind = sounds.current.wind
+    const storm = sounds.current.storm
+    if (!storm) return
+
     try {
-      if (!s.playing()) {
-        s.play()
-      }
-      s.fade(0, vol, 1500)
+      if (!storm.playing()) storm.play()
+      safeFade(storm, storm.volume(), vol, 1200)
+      safeFade(wind, wind?.volume() ?? 0, 0.06, 1200)
     } catch (e) {
       console.warn(e)
     }
-  }
+  }, [])
 
-  const playClean = () => {
-    const s = sounds.current.clean
-    if (!s) return
+  const playClean = useCallback(() => {
+    const wind = sounds.current.wind
+    const storm = sounds.current.storm
+    const clean = sounds.current.clean
+    if (!clean) return
+
     try {
-      if (!s.playing()) {
-        s.play()
-      }
-      s.fade(0, 0.2, 2000)
+      if (!clean.playing()) clean.play()
+      safeFade(clean, clean.volume(), 0.16, 1800)
+      safeFade(wind, wind?.volume() ?? 0, 0, 1000)
+      safeFade(storm, storm?.volume() ?? 0, 0, 1000)
     } catch (e) {
       console.warn(e)
     }
-  }
+  }, [])
 
-  const stopAll = () => {
-    Object.values(sounds.current).forEach(s => {
-      if (s) s.stop()
+  const stopAll = useCallback(() => {
+    Object.values(sounds.current).forEach((s) => {
+      if (s?.playing()) s.stop()
     })
-  }
+  }, [])
 
   return { playWind, stopWind, playStorm, playClean, stopAll }
 }

@@ -1,31 +1,35 @@
 import { useEffect, useRef } from 'react'
-import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
-gsap.registerPlugin(ScrollTrigger)
-
 /**
- * useScrollZone
- * Fires `onEnter` callback when a zone element enters the viewport.
- * Returns a ref to attach to the zone's root element.
+ * Fires `onEnter` when a zone element crosses the viewport midpoint.
+ * Uses a ref for the callback so ScrollTrigger isn't recreated every render.
  */
 export function useScrollZone(onEnter, zoneIndex) {
   const ref = useRef(null)
+  const onEnterRef = useRef(onEnter)
 
   useEffect(() => {
-    if (!ref.current) return
+    onEnterRef.current = onEnter
+  }, [onEnter])
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+
     const trigger = ScrollTrigger.create({
-      trigger: ref.current,
-      start: 'top 50%',
-      end: 'bottom 50%',
+      trigger: el,
+      start: 'top 55%',
+      end: 'bottom 45%',
       onToggle: (self) => {
         if (self.isActive) {
-          onEnter?.(zoneIndex)
+          onEnterRef.current?.(zoneIndex)
         }
       },
     })
+
     return () => trigger.kill()
-  }, [onEnter, zoneIndex])
+  }, [zoneIndex])
 
   return ref
 }

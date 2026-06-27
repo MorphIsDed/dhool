@@ -41,6 +41,11 @@
   --green-hope: #5A7A52;
   --particle-glow: #F4A460;
   --ui-cream: #F5EDD8;
+  --surface-base: #1a0e09;
+  --surface-raised: #23140e;
+  --surface-panel: #2a1810;
+  --text-muted: #c4b5a8;
+  --text-body: #e8dfd0;
 
   --font-display: 'Tiro Devanagari Hindi', serif;
   --font-body: 'Inter', sans-serif;
@@ -53,6 +58,8 @@
 html {
   scroll-behavior: smooth;
   font-size: 16px;
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 body {
@@ -60,6 +67,13 @@ body {
   color: var(--ui-cream);
   font-family: var(--font-body);
   overflow-x: hidden;
+  max-width: 100%;
+  line-height: 1.5;
+}
+
+#root {
+  min-height: 100vh;
+  isolation: isolate;
 }
 
 /* Custom cursor default: show only on fine pointers (desktop) */
@@ -73,7 +87,7 @@ body {
 .cursor {
   position: fixed;
   top: 0; left: 0;
-  width: 0; height: 0;
+  width: 12px; height: 12px;
   pointer-events: none;
   z-index: 9999;
   opacity: 0;
@@ -81,10 +95,9 @@ body {
 }
 
 .cursor-dot {
-  width: 12px; height: 12px;
+  width: 100%; height: 100%;
   background: var(--particle-glow);
   border-radius: 50%;
-  transform: translate3d(-50%, -50%, 0);
   mix-blend-mode: difference;
   transition: transform 0.2s ease, background-color 0.2s ease;
 }
@@ -92,7 +105,7 @@ body {
 .cursor-ring {
   position: fixed;
   top: 0; left: 0;
-  width: 0; height: 0;
+  width: 36px; height: 36px;
   pointer-events: none;
   z-index: 9998;
   opacity: 0;
@@ -100,21 +113,20 @@ body {
 }
 
 .cursor-circle {
-  width: 36px; height: 36px;
+  width: 100%; height: 100%;
   border: 1.5px solid var(--dust-brown);
   border-radius: 50%;
-  transform: translate3d(-50%, -50%, 0);
   transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
 }
 
 /* Custom Cursor Hover States */
 .cursor-hover .cursor-dot {
-  transform: translate3d(-50%, -50%, 0) scale(1.6);
+  transform: scale(1.6);
   background-color: var(--ui-cream);
 }
 
 .cursor-ring-hover .cursor-circle {
-  transform: translate3d(-50%, -50%, 0) scale(1.4);
+  transform: scale(1.4);
   border-color: var(--particle-glow);
   background-color: rgba(244, 164, 96, 0.15);
 }
@@ -138,16 +150,109 @@ canvas { display: block; }
 /* ─── Zone Sections ─── */
 .zone {
   position: relative;
-  min-height: 100vh;
   width: 100%;
+  scroll-margin-top: 4.5rem;
+}
+
+.section-shell {
+  width: min(100% - clamp(1.5rem, 5vw, 4rem), 68rem);
+  margin-inline: auto;
+}
+
+/* ─── Section surfaces (block 3D bleed-through) ─── */
+.zone-surface {
+  background: var(--surface-base);
+}
+
+.zone-surface-raised {
+  background: var(--surface-raised);
+}
+
+.zone-surface-panel {
+  background: var(--surface-panel);
+}
+
+.text-body {
+  color: var(--text-body);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.text-muted {
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+/* ─── Editorial typography ─── */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--dust-brown);
+}
+
+.section-heading {
+  margin-bottom: clamp(3rem, 6vw, 5rem);
+}
+
+.section-title {
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: var(--sand-light);
+}
+
+.section-lead {
+  max-width: 34rem;
+  font-size: clamp(1.0625rem, 1.5vw, 1.1875rem);
+  line-height: 1.75;
+  color: var(--text-body);
+}
+
+.editorial-section {
+  position: relative;
+  padding-block: clamp(6rem, 12vw, 9rem);
+}
+
+.zone-panel {
+  border: 1px solid color-mix(in srgb, white 12%, transparent);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--surface-panel) 96%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, white 6%, transparent) inset,
+    0 20px 50px rgba(0, 0, 0, 0.35);
+}
+
+.zone-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--dust-brown) 22%, transparent);
+  background: color-mix(in srgb, var(--earth-dark) 55%, transparent);
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--haze-grey) 80%, transparent);
 }
 
 .zone-divider {
   width: 100%;
   height: 1px;
   background: linear-gradient(to right, transparent, var(--dust-brown), transparent);
-  opacity: 0.15;
+  opacity: 0.25;
   margin: 0;
+}
+
+.zone + .zone {
+  border-top: 1px solid color-mix(in srgb, white 6%, transparent);
 }
 
 /* ─── Premium Range Slider Styling ─── */

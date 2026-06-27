@@ -1,55 +1,95 @@
 import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { SplitText } from 'gsap/SplitText'
 
-gsap.registerPlugin(ScrollTrigger, SplitText)
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' &&
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 /**
- * Animate text in by splitting into chars and staggering entry
+ * Animate a heading without rewriting its DOM or destroying intentional line breaks.
  */
 export function animateTextIn(selector, delay = 0) {
+  if (prefersReducedMotion()) return null
+
   const el = typeof selector === 'string' ? document.querySelector(selector) : selector
-  if (!el) return
-  const split = new SplitText(el, { type: 'chars,words' })
-  return gsap.from(split.chars, {
-    opacity: 0,
-    y: 40,
-    rotateX: -90,
-    stagger: 0.03,
-    duration: 0.7,
-    ease: 'back.out(1.7)',
-    delay,
-  })
+  if (!el) return null
+
+  return gsap.fromTo(
+    el,
+    { opacity: 0, y: 20 },
+    {
+      opacity: 1,
+      y: 0,
+      duration: 0.7,
+      ease: 'power2.out',
+      delay,
+      clearProps: 'transform,opacity',
+    },
+  )
 }
 
 /**
- * Fade + slide up a set of elements on scroll entry
+ * One-shot reveal driven by IntersectionObserver — avoids ScrollTrigger layout thrash.
+ * Returns a cleanup function for use inside useEffect.
  */
 export function scrollReveal(targets, options = {}) {
-  return gsap.from(targets, {
-    scrollTrigger: {
-      trigger: targets[0] || targets,
-      start: 'top 80%',
-      toggleActions: 'play none none reverse',
+  const elements = gsap.utils.toArray(targets)
+  if (!elements.length) return () => {}
+
+  const { stagger = 0 } = options
+
+  if (prefersReducedMotion()) {
+    gsap.set(elements, { clearProps: 'opacity,transform,visibility' })
+    return () => {}
+  }
+
+  gsap.killTweensOf(elements)
+  gsap.set(elements, { opacity: 0, y: 16 })
+
+  const reveal = (el, delay = 0) => {
+    gsap.to(el, {
+      opacity: 1,
+      y: 0,
+      duration: 0.55,
+      delay,
+      ease: 'power2.out',
+      clearProps: 'transform,opacity',
+    })
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return
+        const el = entry.target
+        const index = elements.indexOf(el)
+        const delay = index >= 0 ? index * stagger : 0
+        reveal(el, delay)
+        observer.unobserve(el)
+      })
     },
-    opacity: 0,
-    y: 60,
-    duration: 0.8,
-    stagger: 0.15,
-    ease: 'power3.out',
-    ...options,
+    { threshold: 0.08, rootMargin: '0px 0px -5% 0px' },
+  )
+
+  elements.forEach((el) => {
+    observer.observe(el)
+    // Safety: ensure content is visible even if observer never fires
+    setTimeout(() => {
+      if (getComputedStyle(el).opacity === '0') reveal(el, 0)
+    }, 1200)
   })
+
+  return () => observer.disconnect()
 }
 
 /**
  * Horizontal parallax drift for background layers
  */
 export function parallaxDrift(el, speed = 0.3) {
+  if (prefersReducedMotion() || !el) return null
+
   return gsap.to(el, {
-    scrollTrigger: {
-      scrub: speed,
-    },
-    yPercent: -20,
+    scrollTrigger: { scrub: speed },
+    yPercent: -12,
     ease: 'none',
   })
 }

@@ -3,29 +3,28 @@ import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
 const HAZE_CONFIGS = [
-  { color: '#402a1e', density: 0.045 }, // Zone 0: Entry (dense dust storm)
-  { color: '#4a3224', density: 0.035 }, // Zone 1: The Land (hazy map view)
-  { color: '#402a1e', density: 0.040 }, // Zone 2: The People (street pollution)
-  { color: '#33231a', density: 0.025 }, // Zone 3: Science (instrument panel)
-  { color: '#1f2e22', density: 0.012 }, // Zone 4: Solutions (clearing air)
-  { color: '#162419', density: 0.008 }  // Zone 5: Pledge (clean green future)
+  { color: '#402a1e', density: 0.038 },
+  { color: '#4a3224', density: 0.03 },
+  { color: '#402a1e', density: 0.034 },
+  { color: '#33231a', density: 0.022 },
+  { color: '#1f2e22', density: 0.011 },
+  { color: '#162419', density: 0.007 },
 ]
+
+const TARGET_COLORS = HAZE_CONFIGS.map((c) => new THREE.Color(c.color))
 
 export default function DustHaze({ activeZone }) {
   const fogRef = useRef()
-
-  // Track values in refs to lerp smoothly
-  const colorRef = useRef(new THREE.Color(HAZE_CONFIGS[0].color))
+  const colorRef = useRef(TARGET_COLORS[0].clone())
   const densityRef = useRef(HAZE_CONFIGS[0].density)
 
-  useFrame((state, delta) => {
-    const config = HAZE_CONFIGS[activeZone] || HAZE_CONFIGS[0]
-    const targetColor = new THREE.Color(config.color)
-    const targetDensity = config.density
+  useFrame((_, delta) => {
+    const idx = activeZone ?? 0
+    const targetColor = TARGET_COLORS[idx] ?? TARGET_COLORS[0]
+    const targetDensity = HAZE_CONFIGS[idx]?.density ?? HAZE_CONFIGS[0].density
 
-    // Lerp density and color values
-    densityRef.current = THREE.MathUtils.lerp(densityRef.current, targetDensity, delta * 2.0)
-    colorRef.current.lerp(targetColor, delta * 2.0)
+    densityRef.current = THREE.MathUtils.lerp(densityRef.current, targetDensity, delta * 1.6)
+    colorRef.current.lerp(targetColor, delta * 1.6)
 
     if (fogRef.current) {
       fogRef.current.density = densityRef.current
@@ -35,12 +34,5 @@ export default function DustHaze({ activeZone }) {
 
   const initial = HAZE_CONFIGS[0]
 
-  return (
-    <fogExp2 
-      ref={fogRef}
-      attach="fog" 
-      color={initial.color} 
-      density={initial.density} 
-    />
-  )
+  return <fogExp2 ref={fogRef} attach="fog" color={initial.color} density={initial.density} />
 }
