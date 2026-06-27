@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+/* ─── Custom Properties ─── */
+:root {
+  --dust-brown:    #C4956A;
+  --rust-red:      #A0522D;
+  --sand-light:    #E8D5B7;
+  --earth-dark:    #2C1810;
+  --haze-grey:     #B8A898;
+  --sky-haze:      #D4C4A8;
+  --green-hope:    #5A7A52;
+  --particle-glow: #F4A460;
+  --ui-cream:      #F5EDD8;
+
+  --font-display: 'Tiro Devanagari Hindi', serif;
+  --font-body:    'Inter', sans-serif;
+  --font-mono:    'JetBrains Mono', monospace;
+}
+
+/* ─── Base ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  background: var(--earth-dark);
+  color: var(--ui-cream);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  cursor: none; /* custom cursor */
+}
+
+/* ─── Custom Cursor ─── */
+.cursor {
+  width: 12px; height: 12px;
+  background: var(--particle-glow);
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: difference;
+  transition: transform 0.15s ease;
+}
+.cursor-ring {
+  width: 36px; height: 36px;
+  border: 1.5px solid var(--dust-brown);
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 9998;
+  transition: transform 0.35s ease, width 0.2s, height 0.2s;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--earth-dark); }
+::-webkit-scrollbar-thumb { background: var(--dust-brown); border-radius: 2px; }
+
+/* ─── Canvas ─── */
+canvas { display: block; }
+
+/* ─── Zone Sections ─── */
+.zone {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* ─── Utility: Dust Text Effect ─── */
+.text-dust {
+  background: linear-gradient(135deg, var(--sand-light), var(--dust-brown));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Reduce motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
