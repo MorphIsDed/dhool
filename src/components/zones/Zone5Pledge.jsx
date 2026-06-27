@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { useScrollZone } from '@hooks/useScrollZone'
 import { SOLUTIONS } from '@data/solutions'
 import { scrollReveal } from '@utils/gsapHelpers'
@@ -74,7 +75,7 @@ export default function Zone5Pledge({ onEnter }) {
         </div>
 
         {/* Policy Brief Download */}
-        <div className="scroll-target border-t border-white/10 pt-12 mt-12 max-w-xl mx-auto">
+        <div className="scroll-target border-t border-white/10 pt-8 mt-8 max-w-xl mx-auto">
           <p className="text-xs text-haze-grey mb-6 tracking-wide leading-relaxed">
             Are you a municipal authority, developer, or policymaker? Access the full, structured clean air plan.
           </p>
@@ -91,57 +92,61 @@ export default function Zone5Pledge({ onEnter }) {
       {/* 
         Print-only Policy Brief Container
         Visible only when printing. CSS is applied globally in globals.css.
+        Portaled to document.body to prevent parent display:none inheritance during prints.
       */}
-      <div id="print-brief" className="hidden print:block bg-white text-black p-12">
-        <div className="border-b-2 border-black pb-6 mb-8">
-          <h1 className="text-4xl font-bold uppercase tracking-wider">DHOOL (धूल)</h1>
-          <h2 className="text-lg text-gray-600 mt-1 uppercase tracking-widest">Policy Brief & Action Report</h2>
-          <p className="text-xs text-gray-500 mt-2">Raipur–Bhilai–Durg Corridor PM10 Mitigation Project</p>
-        </div>
+      {createPortal(
+        <div id="print-brief" className="hidden print:block bg-white text-black p-12">
+          <div className="border-b-2 border-black pb-6 mb-8">
+            <h1 className="text-4xl font-bold uppercase tracking-wider">DHOOL (धूल)</h1>
+            <h2 className="text-lg text-gray-600 mt-1 uppercase tracking-widest">Policy Brief & Action Report</h2>
+            <p className="text-xs text-gray-500 mt-2">Raipur–Bhilai–Durg Corridor PM10 Mitigation Project</p>
+          </div>
 
-        <div className="mb-8">
-          <h3 className="text-lg font-bold uppercase border-b border-gray-300 pb-2 mb-4">I. Key Targets</h3>
-          <p className="text-sm leading-relaxed mb-2">
-            Standard AQI measurements underrepresent the threat of PM10 (coarse dust particles) in industrial corridor centers. Active construction, slag dust, and heavy truck cargo movement regularly drive local PM10 values past 300 µg/m³.
-          </p>
-        </div>
-        
-        <div className="mb-8">
-          <h3 className="text-lg font-bold uppercase border-b border-gray-300 pb-2 mb-4">II. Proposed Interventions</h3>
-          <div className="grid grid-cols-2 gap-8">
-            <div>
-              <h4 className="font-bold text-sm mb-3 uppercase tracking-wider">For Authorities</h4>
-              <ul className="space-y-4 text-xs">
-                {SOLUTIONS.authorities.map(sol => (
-                  <li key={sol.id} className="border-b border-gray-100 pb-3 last:border-0">
-                    <span className="font-bold">{sol.title}</span> — {sol.description}
-                    <div className="text-[10px] text-gray-500 mt-1">
-                      Impact: {sol.impact} | Cost: {sol.cost} | Timeline: {sol.timeline}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold text-sm mb-3 uppercase tracking-wider">For Citizens</h4>
-              <ul className="space-y-4 text-xs">
-                {SOLUTIONS.citizens.map(sol => (
-                  <li key={sol.id} className="border-b border-gray-100 pb-3 last:border-0">
-                    <span className="font-bold">{sol.title}</span> — {sol.description}
-                    <div className="text-[10px] text-gray-500 mt-1">
-                      Impact: {sol.impact} | Cost: {sol.cost} | Timeline: {sol.timeline}
-                    </div>
-                  </li>
-                ))}
-              </ul>
+          <div className="mb-8">
+            <h3 className="text-lg font-bold uppercase border-b border-gray-300 pb-2 mb-4">I. Key Targets</h3>
+            <p className="text-sm leading-relaxed mb-2">
+              Standard AQI measurements underrepresent the threat of PM10 (coarse dust particles) in industrial corridor centers. Active construction, slag dust, and heavy truck cargo movement regularly drive local PM10 values past 300 µg/m³.
+            </p>
+          </div>
+          
+          <div className="mb-8">
+            <h3 className="text-lg font-bold uppercase border-b border-gray-300 pb-2 mb-4">II. Proposed Interventions</h3>
+            <div className="grid grid-cols-2 gap-8">
+              <div>
+                <h4 className="font-bold text-sm mb-3 uppercase tracking-wider">For Authorities</h4>
+                <ul className="space-y-4 text-xs">
+                  {SOLUTIONS.authorities.map(sol => (
+                    <li key={sol.id} className="border-b border-gray-100 pb-3 last:border-0">
+                      <span className="font-bold">{sol.title}</span> &mdash; {sol.description}
+                      <div className="text-[10px] text-gray-500 mt-1">
+                        Impact: {sol.impact} | Cost: {sol.cost} | Timeline: {sol.timeline}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-bold text-sm mb-3 uppercase tracking-wider">For Citizens</h4>
+                <ul className="space-y-4 text-xs">
+                  {SOLUTIONS.citizens.map(sol => (
+                    <li key={sol.id} className="border-b border-gray-100 pb-3 last:border-0">
+                      <span className="font-bold">{sol.title}</span> &mdash; {sol.description}
+                      <div className="text-[10px] text-gray-500 mt-1">
+                        Impact: {sol.impact} | Cost: {sol.cost} | Timeline: {sol.timeline}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="border-t border-black pt-6 mt-16 text-center text-[10px] text-gray-500">
-          Generated dynamically by citizen action. Verified against municipal dataset models.
-        </div>
-      </div>
+          <div className="border-t border-black pt-6 mt-16 text-center text-[10px] text-gray-500">
+            Generated dynamically by citizen action. Verified against municipal dataset models.
+          </div>
+        </div>,
+        document.body
+      )}
     </section>
   )
 }

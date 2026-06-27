@@ -16,6 +16,6 @@ export default defineConfig({
     },
   },
   build: {
-    chunkSizeWarningLimit: 1200 // Raise limit since mapbox-gl is naturally large
+    chunkSizeWarningLimit: 1200 // Raise limit since Leaflet and Three.js are naturally large
   }
 })

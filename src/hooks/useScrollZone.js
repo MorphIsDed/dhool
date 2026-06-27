@@ -16,9 +16,13 @@ export function useScrollZone(onEnter, zoneIndex) {
     if (!ref.current) return
     const trigger = ScrollTrigger.create({
       trigger: ref.current,
-      start: 'top 60%',
-      onEnter: () => onEnter?.(zoneIndex),
-      onEnterBack: () => onEnter?.(zoneIndex),
+      start: 'top 50%',
+      end: 'bottom 50%',
+      onToggle: (self) => {
+        if (self.isActive) {
+          onEnter?.(zoneIndex)
+        }
+      },
     })
     return () => trigger.kill()
   }, [onEnter, zoneIndex])

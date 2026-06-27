@@ -34,7 +34,7 @@ export default function Zone2People({ onEnter }) {
           The Human Cost
         </h2>
 
-        <div ref={containerRef} className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div ref={containerRef} className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           {PEOPLE.map((person) => (
             <div 
               key={person.id}
@@ -74,25 +74,38 @@ export default function Zone2People({ onEnter }) {
               >
                 {person.label}
               </h3>
-
-              {/* Story Reveal Accordion */}
-              <div 
-                aria-hidden={activePerson !== person.id}
-                className={`overflow-hidden transition-all duration-500 ease-in-out ${
-                  activePerson === person.id ? 'max-h-[500px] opacity-100 mt-4' : 'max-h-0 opacity-0 mt-0'
-                }`}
-              >
-                <div className="bg-earth-dark/90 backdrop-blur-md p-6 rounded-xl border border-white/10 text-xs">
-                  <p className="text-haze-grey mb-4 leading-relaxed">
-                    {person.story}
-                  </p>
-                  <div className="p-3 bg-white/5 rounded border-l-2" style={{ borderColor: person.color }}>
-                    <p className="font-mono text-sand-light tracking-wide">{person.stat}</p>
-                  </div>
-                </div>
-              </div>
             </div>
           ))}
+        </div>
+
+        {/* Centralized Story Spotlight Panel */}
+        <div className="w-full max-w-3xl mx-auto min-h-[160px] transition-all duration-500 ease-in-out">
+          {activePerson ? (
+            (() => {
+              const person = PEOPLE.find(p => p.id === activePerson)
+              return (
+                <div className="bg-earth-dark/95 backdrop-blur-md p-6 md:p-8 rounded-2xl border border-white/10 shadow-2xl animate-fade-in flex flex-col md:flex-row gap-6 md:gap-8 items-center text-left">
+                  <div className="flex-1">
+                    <h4 className="text-xl font-bold mb-3" style={{ color: person.color }}>
+                      {person.label}'s Chronicle
+                    </h4>
+                    <p className="text-haze-grey text-xs md:text-sm leading-relaxed">
+                      {person.story}
+                    </p>
+                  </div>
+                  <div className="w-full md:w-64 p-4 bg-white/5 rounded-xl border-l-4 shadow-inner flex flex-col justify-center" style={{ borderColor: person.color }}>
+                    <p className="font-mono text-sand-light text-[11px] leading-relaxed tracking-wide">
+                      {person.stat}
+                    </p>
+                  </div>
+                </div>
+              )
+            })()
+          ) : (
+            <div className="text-haze-grey text-xs italic opacity-60 border border-white/10 rounded-2xl p-6 text-center bg-black/25 backdrop-blur-sm">
+              Click a portrait profile above to listen to their personal story.
+            </div>
+          )}
         </div>
       </div>
     </section>

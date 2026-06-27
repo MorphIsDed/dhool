@@ -35,11 +35,14 @@ export default function Navbar({ activeZone }) {
             href={`#${ZONE_IDS[i]}`}
             onClick={(e) => handleScroll(e, i)}
             aria-current={activeZone === i ? 'page' : undefined}
-            className={`text-xs tracking-widest uppercase transition-colors duration-300 font-medium ${
+            className={`text-xs tracking-widest uppercase transition-colors duration-300 font-medium relative pb-1.5 ${
               activeZone === i ? 'text-particle-glow' : 'text-haze-grey hover:text-sand-light'
             }`}
           >
             {z}
+            {activeZone === i && (
+              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-particle-glow rounded-full animate-fade-in" />
+            )}
           </a>
         ))}
       </div>
@@ -65,26 +68,28 @@ export default function Navbar({ activeZone }) {
       </button>
 
       {/* Mobile Slide-down Panel */}
-      {menuOpen && (
-        <div className="absolute top-[100%] left-0 right-0 bg-earth-dark/95 border-b border-dust-brown/20 flex flex-col items-center gap-4 py-6 md:hidden animate-fade-in shadow-2xl z-50">
-          {ZONES.map((z, i) => (
-            <a 
-              key={z} 
-              href={`#${ZONE_IDS[i]}`}
-              onClick={(e) => {
-                handleScroll(e, i)
-                setMenuOpen(false)
-              }}
-              aria-current={activeZone === i ? 'page' : undefined}
-              className={`text-xs tracking-widest uppercase transition-colors duration-300 font-medium py-2 ${
-                activeZone === i ? 'text-particle-glow' : 'text-haze-grey hover:text-sand-light'
-              }`}
-            >
-              {z}
-            </a>
-          ))}
-        </div>
-      )}
+      <div 
+        className={`absolute top-[100%] left-0 right-0 bg-earth-dark/95 border-b border-dust-brown/20 flex flex-col items-center gap-4 py-6 md:hidden shadow-2xl z-50 transition-all duration-300 ease-in-out origin-top ${
+          menuOpen ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-0 pointer-events-none'
+        }`}
+      >
+        {ZONES.map((z, i) => (
+          <a 
+            key={z} 
+            href={`#${ZONE_IDS[i]}`}
+            onClick={(e) => {
+              handleScroll(e, i)
+              setMenuOpen(false)
+            }}
+            aria-current={activeZone === i ? 'page' : undefined}
+            className={`text-xs tracking-widest uppercase transition-colors duration-300 font-medium py-2 ${
+              activeZone === i ? 'text-particle-glow' : 'text-haze-grey hover:text-sand-light'
+            }`}
+          >
+            {z}
+          </a>
+        ))}
+      </div>
     </nav>
   )
 }

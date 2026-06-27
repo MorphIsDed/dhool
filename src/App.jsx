@@ -44,17 +44,47 @@ export default function App() {
 
     if (touchCheck) return
 
+    let hasMoved = false
+
     const move = (e) => {
+      if (!hasMoved) {
+        hasMoved = true
+        if (cursorRef.current) cursorRef.current.style.opacity = '1'
+        if (cursorRingRef.current) cursorRingRef.current.style.opacity = '1'
+      }
       if (cursorRef.current) {
-        cursorRef.current.style.transform = `translate3d(${e.clientX - 6}px, ${e.clientY - 6}px, 0)`
+        cursorRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`
       }
       if (cursorRingRef.current) {
-        cursorRingRef.current.style.transform = `translate3d(${e.clientX - 18}px, ${e.clientY - 18}px, 0)`
+        cursorRingRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`
+      }
+    }
+
+    const handleMouseOver = (e) => {
+      const target = e.target.closest('a, button, input, select, textarea, [role="button"], .cursor-pointer, .solution-card-wrapper')
+      if (target) {
+        cursorRef.current?.classList.add('cursor-hover')
+        cursorRingRef.current?.classList.add('cursor-ring-hover')
+      }
+    }
+
+    const handleMouseOut = (e) => {
+      const target = e.target.closest('a, button, input, select, textarea, [role="button"], .cursor-pointer, .solution-card-wrapper')
+      if (target) {
+        cursorRef.current?.classList.remove('cursor-hover')
+        cursorRingRef.current?.classList.remove('cursor-ring-hover')
       }
     }
     
     window.addEventListener('mousemove', move)
-    return () => window.removeEventListener('mousemove', move)
+    window.addEventListener('mouseover', handleMouseOver)
+    window.addEventListener('mouseout', handleMouseOut)
+
+    return () => {
+      window.removeEventListener('mousemove', move)
+      window.removeEventListener('mouseover', handleMouseOver)
+      window.removeEventListener('mouseout', handleMouseOut)
+    }
   }, [])
 
   // Audio trigger effect based on activeZone
@@ -132,8 +162,12 @@ export default function App() {
       {/* Custom Cursor (Fine pointer only) */}
       {!isTouchDevice && (
         <>
-          <div ref={cursorRef} className="cursor" />
-          <div ref={cursorRingRef} className="cursor-ring" />
+          <div ref={cursorRef} className="cursor">
+            <div className="cursor-dot" />
+          </div>
+          <div ref={cursorRingRef} className="cursor-ring">
+            <div className="cursor-circle" />
+          </div>
         </>
       )}
 

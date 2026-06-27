@@ -12,7 +12,7 @@ export default function ZoneIndicator({ activeZone }) {
   return (
     <nav 
       aria-label="Zone Indicator Navigation" 
-      className="fixed right-6 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-[1000]"
+      className="fixed right-6 top-1/2 -translate-y-1/2 hidden md:flex flex-col gap-4 z-[1000]"
     >
       {ZONES.map((zone, i) => (
         <button

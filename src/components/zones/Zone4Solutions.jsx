@@ -21,9 +21,10 @@ export default function Zone4Solutions({ onEnter }) {
 
   return (
     <section ref={zoneRef} className="zone min-h-screen py-24 bg-earth-dark/90 backdrop-blur-sm" id="Zone4Solutions">
+      <div className="zone-divider absolute top-0 left-0 right-0" />
       <div className="max-w-7xl mx-auto px-6">
         
-        <div className="text-center mb-20">
+        <div className="text-center mb-14">
           <h2 
             ref={titleRef}
             className="text-4xl md:text-5xl font-bold text-sand-light mb-6"

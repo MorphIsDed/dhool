@@ -113,7 +113,7 @@ export default function Zone3Science({ onEnter }) {
             
             {/* SVG Circular Arc Gauge */}
             <div className="relative w-44 h-44 flex items-center justify-center mb-6">
-              <svg className="w-full h-full -rotate-90">
+              <svg className="w-full h-full -rotate-90" viewBox="0 0 176 176">
                 <circle 
                   cx="88" cy="88" r={radius} 
                   className="stroke-white/5 fill-none" 
@@ -148,7 +148,7 @@ export default function Zone3Science({ onEnter }) {
             
             {/* SVG Circular Arc Gauge */}
             <div className="relative w-44 h-44 flex items-center justify-center mb-6">
-              <svg className="w-full h-full -rotate-90">
+              <svg className="w-full h-full -rotate-90" viewBox="0 0 176 176">
                 <circle 
                   cx="88" cy="88" r={radius} 
                   className="stroke-white/5 fill-none" 

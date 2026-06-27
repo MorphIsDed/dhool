@@ -31,6 +31,10 @@ export default function Zone1Land({ onEnter }) {
         
         el.addEventListener('mouseenter', () => setActiveHotspot(hotspot))
         el.addEventListener('mouseleave', () => setActiveHotspot(null))
+        el.addEventListener('click', (e) => {
+          e.stopPropagation()
+          setActiveHotspot(prev => prev?.id === hotspot.id ? null : hotspot)
+        })
 
         const customIcon = L.divIcon({
           html: el,
@@ -57,7 +61,7 @@ export default function Zone1Land({ onEnter }) {
   }, [])
 
   return (
-    <section ref={zoneRef} className="zone relative h-screen overflow-hidden" id="Zone1Land">
+    <section ref={zoneRef} className="zone relative min-h-screen overflow-hidden" id="Zone1Land">
       {/* Map Container with sepia/blend overlays */}
       <div 
         ref={mapContainerRef} 

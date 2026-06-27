@@ -1,6 +1,6 @@
 export default function Footer() {
   return (
-    <footer className="w-full bg-earth-dark/95 border-t border-white/5 py-12 px-6 text-center select-none z-20 relative">
+    <footer className="w-full bg-earth-dark/95 border-t border-white/5 py-8 px-6 text-center select-none z-20 relative">
       <div className="max-w-4xl mx-auto flex flex-col items-center gap-6">
         
         {/* Logo and Tagline */}
@@ -25,7 +25,7 @@ export default function Footer() {
         <div className="text-[10px] text-haze-grey/40 border-t border-white/5 pt-6 w-full flex flex-col md:flex-row justify-between items-center gap-4">
           <span>&copy; {new Date().getFullYear()} DHOOL. All rights reserved.</span>
           <span className="font-mono hover:text-sand-light transition-colors cursor-pointer">
-            Engineered with React + Three.js + Mapbox GL
+            Engineered with React + Three.js + Leaflet
           </span>
         </div>
 

@@ -55,7 +55,7 @@ export default function SolutionCard({ icon, title, description, impact, timelin
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       tabIndex={0}
-      className="bg-earth-dark/85 backdrop-blur-md rounded-xl p-6 border transition-all duration-300 ease-out cursor-pointer hover:-translate-y-1 hover:border-dust-brown/70 border-dust-brown/20 focus:outline-none focus:ring-1 focus:ring-dust-brown"
+      className="bg-earth-dark/85 backdrop-blur-md rounded-xl p-6 border transition-all duration-300 ease-out cursor-pointer hover:-translate-y-1 hover:border-dust-brown/70 hover:shadow-[0_4px_20px_rgba(196,149,106,0.08)] border-dust-brown/20 focus:outline-none focus:ring-1 focus:ring-dust-brown"
     >
       <div 
         className={`mb-4 transition-colors duration-300 ${
