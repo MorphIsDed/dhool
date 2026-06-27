@@ -1,11 +1,14 @@
 import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+gsap.registerPlugin(ScrollTrigger)
 
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' &&
   window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 /**
- * Animate a heading without rewriting its DOM or destroying intentional line breaks.
+ * Animate a heading on mount (hero titles, section headers).
  */
 export function animateTextIn(selector, delay = 0) {
   if (prefersReducedMotion()) return null
@@ -15,70 +18,85 @@ export function animateTextIn(selector, delay = 0) {
 
   return gsap.fromTo(
     el,
-    { opacity: 0, y: 20 },
+    { autoAlpha: 0, y: 20 },
     {
-      opacity: 1,
+      autoAlpha: 1,
       y: 0,
-      duration: 0.7,
+      duration: 0.75,
       ease: 'power2.out',
       delay,
-      clearProps: 'transform,opacity',
+      clearProps: 'transform,visibility,opacity',
     },
   )
 }
 
 /**
- * One-shot reveal driven by IntersectionObserver — avoids ScrollTrigger layout thrash.
- * Returns a cleanup function for use inside useEffect.
+ * Scroll-triggered stagger reveal. Uses `once: true` so content never
+ * re-hides on scroll-back. Falls back to visible if trigger never fires.
  */
 export function scrollReveal(targets, options = {}) {
   const elements = gsap.utils.toArray(targets)
   if (!elements.length) return () => {}
 
-  const { stagger = 0 } = options
+  const {
+    stagger = 0.1,
+    y = 28,
+    duration = 0.7,
+    trigger,
+    start = 'top 85%',
+  } = options
 
   if (prefersReducedMotion()) {
-    gsap.set(elements, { clearProps: 'opacity,transform,visibility' })
+    gsap.set(elements, { clearProps: 'all' })
     return () => {}
   }
 
   gsap.killTweensOf(elements)
-  gsap.set(elements, { opacity: 0, y: 16 })
 
-  const reveal = (el, delay = 0) => {
-    gsap.to(el, {
-      opacity: 1,
-      y: 0,
-      duration: 0.55,
-      delay,
-      ease: 'power2.out',
-      clearProps: 'transform,opacity',
-    })
-  }
+  const triggerEl = trigger || elements[0]
+  gsap.set(elements, { autoAlpha: 0, y })
 
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return
-        const el = entry.target
-        const index = elements.indexOf(el)
-        const delay = index >= 0 ? index * stagger : 0
-        reveal(el, delay)
-        observer.unobserve(el)
-      })
+  const tween = gsap.to(elements, {
+    autoAlpha: 1,
+    y: 0,
+    duration,
+    stagger,
+    ease: 'power2.out',
+    scrollTrigger: {
+      trigger: triggerEl,
+      start,
+      toggleActions: 'play none none none',
+      once: true,
     },
-    { threshold: 0.08, rootMargin: '0px 0px -5% 0px' },
-  )
-
-  elements.forEach((el) => {
-    observer.observe(el)
-    // Safety: ensure content is visible even if observer never fires
-    setTimeout(() => {
-      if (getComputedStyle(el).opacity === '0') reveal(el, 0)
-    }, 1200)
+    clearProps: 'transform,visibility,opacity',
   })
 
-  return () => observer.disconnect()
+  const st = tween.scrollTrigger
+
+  // If the section is already on screen (e.g. after loading), play immediately
+  requestAnimationFrame(() => {
+    ScrollTrigger.refresh()
+    if (st && st.progress === 1) {
+      gsap.set(elements, { clearProps: 'all' })
+    }
+  })
+
+  // Safety net: never leave content hidden
+  const fallback = setTimeout(() => {
+    elements.forEach((el) => {
+      const opacity = parseFloat(getComputedStyle(el).opacity)
+      if (opacity < 0.1) {
+        gsap.set(el, { autoAlpha: 1, y: 0, clearProps: 'all' })
+      }
+    })
+  }, 2000)
+
+  return () => {
+    clearTimeout(fallback)
+    st?.kill()
+    tween.kill()
+    gsap.set(elements, { clearProps: 'all' })
+  }
 }
 
 /**
@@ -87,9 +105,11 @@ export function scrollReveal(targets, options = {}) {
 export function parallaxDrift(el, speed = 0.3) {
   if (prefersReducedMotion() || !el) return null
 
-  return gsap.to(el, {
+  const tween = gsap.to(el, {
     scrollTrigger: { scrub: speed },
     yPercent: -12,
     ease: 'none',
   })
+
+  return tween
 }
