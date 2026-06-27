@@ -57,6 +57,7 @@ export default function Zone3Science({ onEnter }) {
       pmTween.kill()
       aqiTween.kill()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPm10, currentAqi, loading])
 
   useEffect(() => {
@@ -196,9 +197,29 @@ export default function Zone3Science({ onEnter }) {
             <span>Winter</span>
             <span>Summer</span>
           </div>
+
+          {/* Dynamic Data Connection Status Badge */}
+          <div className="flex items-center justify-center gap-2 mt-6 border-t border-white/5 pt-4 text-[10px] font-mono">
+            {loading ? (
+              <span className="text-haze-grey/70 animate-pulse">Querying live sensor stations...</span>
+            ) : error || data?.fallback ? (
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-rust-red/60" />
+                <span className="text-haze-grey/80">Cached Snapshot &bull; Raipur Center</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-hope opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-hope"></span>
+                </span>
+                <span className="text-green-hope">Live OpenAQ Feed &bull; Raipur (8673)</span>
+              </div>
+            )}
+          </div>
         </div>
 
-        {error && <div className="text-center text-[10px] text-rust-red mt-6 opacity-60">API fetch failed, utilizing historical snapshots.</div>}
+        {error && <div className="text-center text-[9px] text-rust-red mt-4 opacity-50 font-mono">API Connection offline, loaded static historical model.</div>}
       </div>
     </section>
   )

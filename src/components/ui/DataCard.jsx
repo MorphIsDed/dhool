@@ -1,4 +1,27 @@
-export default function DataCard({ title, value, unit, sub, color = 'var(--dust-brown)' }) {
+import { useEffect, useState } from 'react'
+import { gsap } from 'gsap'
+
+export default function DataCard({ title, value, unit, sub, color = 'var(--dust-brown)', animate = false }) {
+  const [displayValue, setDisplayValue] = useState(animate ? 0 : value)
+
+  useEffect(() => {
+    if (!animate) {
+      setDisplayValue(value)
+      return
+    }
+
+    // Object wrapper to animate
+    const obj = { val: 0 }
+    const tween = gsap.to(obj, {
+      val: value,
+      duration: 0.6,
+      ease: 'power2.out',
+      onUpdate: () => setDisplayValue(Math.round(obj.val))
+    })
+
+    return () => tween.kill()
+  }, [value, animate])
+
   return (
     <div 
       className="bg-earth-dark/85 backdrop-blur-md rounded-xl p-6 transition-all duration-300 border"
@@ -11,7 +34,7 @@ export default function DataCard({ title, value, unit, sub, color = 'var(--dust-
         className="text-4xl font-bold font-mono"
         style={{ color }}
       >
-        {value}
+        {displayValue}
         <span className="text-sm font-sans ml-2 text-haze-grey font-normal">
           {unit}
         </span>

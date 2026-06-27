@@ -51,6 +51,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html {
+  scroll-snap-type: y mandatory;
   scroll-behavior: smooth;
   font-size: 16px;
 }
@@ -114,6 +115,8 @@ canvas { display: block; }
   position: relative;
   min-height: 100vh;
   width: 100%;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
 /* ─── Utility: Dust Text Effect ─── */
@@ -126,6 +129,11 @@ canvas { display: block; }
 
 /* ─── Print Styles for PDF Policy Brief ─── */
 @media print {
+  @page {
+    size: A4;
+    margin: 2cm;
+  }
+
   body * {
     visibility: hidden;
   }
@@ -158,4 +166,11 @@ canvas { display: block; }
     transition-duration: 0.01ms !important;
     transition-delay: 0.01ms !important;
   }
+}
+
+/* ─── Leaflet Marker Reset ─── */
+.leaflet-marker-custom {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
 }

@@ -33,8 +33,10 @@ export function useAudio() {
     initSound('storm', AUDIO_CONFIG.storm)
     initSound('clean', AUDIO_CONFIG.clean)
 
+    const activeSounds = sounds.current
+
     return () => {
-      Object.values(sounds.current).forEach(s => {
+      Object.values(activeSounds).forEach(s => {
         if (s && typeof s.unload === 'function') {
           s.unload()
         }

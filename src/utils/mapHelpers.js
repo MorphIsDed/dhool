@@ -1,24 +1,25 @@
-import mapboxgl from 'mapbox-gl'
-import 'mapbox-gl/dist/mapbox-gl.css'
+import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
 
-export function initializeMap(container, center = [81.42, 21.24], zoom = 10.8) {
-  const token = import.meta.env.VITE_MAPBOX_TOKEN
-  if (!token) {
-    console.warn('Mapbox token is missing. Map will not render correctly.')
-  }
-  
-  mapboxgl.accessToken = token || 'pk.eyJ1IjoiZHVtbXkiLCJhIjoiY2R1bW15In0.dummy'
+export function initializeMap(container, center = [21.24, 81.42], zoom = 11) {
+  // Initialize the Leaflet map container
+  const map = L.map(container, {
+    zoomControl: false,
+    attributionControl: false,
+    dragging: false,
+    scrollWheelZoom: false,
+    doubleClickZoom: false,
+    boxZoom: false,
+    touchZoom: false,
+    keyboard: false
+  }).setView(center, zoom)
 
-  return new mapboxgl.Map({
-    container,
-    style: 'mapbox://styles/mapbox/dark-v11',
-    center,
-    zoom,
-    pitch: 45,
-    bearing: -10,
-    interactive: false, // Control via scroll/overlay, not direct drag
-    attributionControl: false
-  })
+  // CartoDB Dark Matter tiles (100% free, dark styled theme matching site aesthetic)
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    maxZoom: 19
+  }).addTo(map)
+
+  return map
 }
 
 export function createMarkerElement(color, size = '16px') {
@@ -58,3 +59,4 @@ export function createMarkerElement(color, size = '16px') {
   
   return container
 }
+export { L }

@@ -102,7 +102,7 @@ export default function LoadingScreen({ onComplete }) {
     >
       {/* Cinematic Word Cycle */}
       <div className="relative h-24 flex items-center justify-center w-full overflow-hidden mb-8">
-        {DUST_IN_LANGUAGES.map((lang, idx) => (
+        {DUST_IN_LANGUAGES.map((lang) => (
           <span 
             key={lang.language} 
             className="absolute opacity-0 translate-y-8 rotate-x-[-45deg] lang-word text-4xl md:text-6xl font-bold tracking-widest text-dust-brown text-center px-4"

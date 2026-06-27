@@ -1,7 +1,11 @@
+import { useState } from 'react'
+
 const ZONES = ['Entry', 'The Land', 'The People', 'The Science', 'Solutions', 'Pledge']
 const ZONE_IDS = ['Zone0Entry', 'Zone1Land', 'Zone2People', 'Zone3Science', 'Zone4Solutions', 'Zone5Pledge']
 
 export default function Navbar({ activeZone }) {
+  const [menuOpen, setMenuOpen] = useState(false)
+
   const handleScroll = (e, index) => {
     e.preventDefault()
     const target = document.getElementById(ZONE_IDS[index])
@@ -13,16 +17,18 @@ export default function Navbar({ activeZone }) {
   return (
     <nav 
       aria-label="Main Navigation" 
-      className="fixed top-0 left-0 right-0 z-[1000] flex justify-between items-center px-8 py-4 bg-earth-dark/70 backdrop-blur-md border-b border-dust-brown/20"
+      className="fixed top-0 left-0 right-0 z-[1000] flex justify-between items-center px-6 md:px-8 py-4 bg-earth-dark/80 backdrop-blur-md border-b border-dust-brown/20"
     >
+      {/* Title logo */}
       <div 
-        className="text-2xl font-bold text-dust-brown"
+        className="text-2xl font-bold text-dust-brown select-none"
         style={{ fontFamily: 'var(--font-display)' }}
       >
         धूल
       </div>
       
-      <div className="flex gap-6">
+      {/* Desktop Links (Hidden on Mobile) */}
+      <div className="hidden md:flex gap-6">
         {ZONES.map((z, i) => (
           <a 
             key={z} 
@@ -37,6 +43,48 @@ export default function Navbar({ activeZone }) {
           </a>
         ))}
       </div>
+
+      {/* Hamburger Toggle Button (Hidden on Desktop) */}
+      <button
+        onClick={() => setMenuOpen(!menuOpen)}
+        aria-label="Toggle menu"
+        aria-expanded={menuOpen}
+        className="block md:hidden text-dust-brown focus:outline-none cursor-pointer"
+      >
+        {menuOpen ? (
+          // Close Icon
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        ) : (
+          // Menu Hamburger Icon
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        )}
+      </button>
+
+      {/* Mobile Slide-down Panel */}
+      {menuOpen && (
+        <div className="absolute top-[100%] left-0 right-0 bg-earth-dark/95 border-b border-dust-brown/20 flex flex-col items-center gap-4 py-6 md:hidden animate-fade-in shadow-2xl z-50">
+          {ZONES.map((z, i) => (
+            <a 
+              key={z} 
+              href={`#${ZONE_IDS[i]}`}
+              onClick={(e) => {
+                handleScroll(e, i)
+                setMenuOpen(false)
+              }}
+              aria-current={activeZone === i ? 'page' : undefined}
+              className={`text-xs tracking-widest uppercase transition-colors duration-300 font-medium py-2 ${
+                activeZone === i ? 'text-particle-glow' : 'text-haze-grey hover:text-sand-light'
+              }`}
+            >
+              {z}
+            </a>
+          ))}
+        </div>
+      )}
     </nav>
   )
 }
